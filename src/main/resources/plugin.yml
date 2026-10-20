@@ -1,0 +1,34 @@
+name: CloverBlessing
+version: "${version}"
+main: net.cloversmp.cloverblessing.CloverPlugin
+description: "Clover Blessing System — a build-crafting system where each player carries a four-leaf clover whose leaves hold blessings they made themselves."
+author: CloverSMP
+api-version: '1.21.11'
+
+commands:
+  clover:
+    description: Main Clover Blessing command
+    usage: /clover <subcommand>
+    permission: clover.use
+    aliases: [cl]
+
+permissions:
+  clover.use:
+    description: Allows use of /clover
+    default: true
+  clover.admin:
+    description: Admin access to Clover Blessing (give blessings and curses)
+    default: op
+    children:
+      clover.admin.reload: true
+      clover.admin.setcharge: true
+      clover.admin.reset: true
+  clover.admin.reload:
+    description: Reload Clover Blessing config
+    default: op
+  clover.admin.setcharge:
+    description: Set a player's charge
+    default: op
+  clover.admin.reset:
+    description: Reset a player's clover
+    default: op

@@ -1,0 +1,122 @@
+# ============================================================
+# Clover Blessing System — Configuration
+# All numbers are starting values for playtesting.
+# ============================================================
+
+# --- Clover Charge Thresholds ---
+charge:
+  max: 1000
+  thresholds:
+    leaf2: 100
+    leaf3: 350
+    leaf4: 800
+  # Permanent floor — charge never drops below this once leaf 2 is reached
+  floor: 100
+  # Death penalty — percentage of charge lost on death
+  death-penalty-percent: 35
+  # Mob and elite charge cannot open leaf 4 — it needs PvP or bosses (once open, mobs count again)
+  leaf4-requires-pvp-or-boss: true
+
+# --- Charge Sources ---
+charge-sources:
+  hostile-mob: 2
+  elite-mob: 10
+  boss: 60
+  player-kill: 40
+  # Mob types that count as elites (Bukkit EntityType names)
+  elite-mobs: [RAVAGER, EVOKER, VINDICATOR, PIGLIN_BRUTE, ELDER_GUARDIAN, BREEZE, WITHER_SKELETON, BLAZE, SHULKER]
+  # Daily mob soft-cap: after this many charge from mob kills, further mobs give 25%
+  daily-mob-cap-charge: 200
+  daily-mob-cap-multiplier: 0.25
+  # Player kill multiplier by victim leaf count
+  pvp-leaf-multiplier:
+    1: 0.5
+    2: 1.0
+    3: 1.0
+    4: 1.5
+  # Minimum damage share to receive assist credit
+  assist-min-damage-share: 0.25
+  # Time window for assist eligibility (seconds)
+  assist-window-seconds: 20
+
+# --- Anti-Abuse ---
+anti-abuse:
+  # Repeat victim diminishing returns inside a rolling window
+  repeat-victim:
+    window-minutes: 60
+    multipliers: [1.0, 0.5, 0.25, 0.0]
+  # Fresh spawn protection (seconds after respawn)
+  fresh-spawn-seconds: 90
+  # Minimum victim playtime to give charge (hours)
+  min-victim-playtime-hours: 2
+  # Kills of your own /clover party members give 0
+  party-kills-zero: true
+
+# --- Parties (/clover party) ---
+party:
+  max-size: 4
+
+# --- Curse pacts (leaf 5) ---
+curse:
+  # Breaking or replacing a curse costs this % of current charge (the floor still applies)
+  break-cost-percent: 15
+
+# --- Boss Cooldown ---
+boss:
+  # How many times per day a boss type rewards charge per player
+  daily-limit-per-type: 1
+
+# --- Pollen (overflow currency) ---
+pollen:
+  # Charge above max converts to pollen at this rate
+  conversion-rate: 1  # 1 overflow charge = 1 pollen
+
+# --- Loadout Rules ---
+loadout:
+  # Seconds out of combat before loadout can change
+  out-of-combat-seconds: 30
+  # A newly equipped blessing cannot fire for this many seconds
+  swap-lock-seconds: 30
+
+# --- Cooldown Rules ---
+cooldowns:
+  # Cooldowns always persist through death, logout and restarts (core rule)
+  # Max cooldown reduction on any blessing from grafts and curses combined
+  max-cdr-percent: 30
+
+# --- Tag Fatigue ---
+tag-fatigue:
+  # Diminishing returns for stacked tags
+  # First source = 100%, second = 50%, third = 25%
+  multipliers: [1.0, 0.5, 0.25]
+
+# --- Sap Cap (healing cap) ---
+sap-cap:
+  # Max blessing healing in hearts per window
+  max-hearts: 6
+  # Window duration in seconds
+  window-seconds: 10
+
+# --- Balance Caps ---
+balance:
+  # No blessing can reduce damage from a single source by more than this %
+  max-single-source-reduction-percent: 50
+
+# --- Crafting ---
+crafting:
+  # Graft prune refund percentage
+  prune-refund-percent: 50
+
+# --- UI ---
+ui:
+  # Action bar refresh interval (ticks)
+  actionbar-refresh-ticks: 10
+  # Leaf particle ring refresh interval (ticks)
+  particle-refresh-ticks: 20
+
+# --- Persistence ---
+storage:
+  # Storage type: "json" (flat file per player)
+  type: json
+  # Auto-save interval (minutes)
+  auto-save-minutes: 5
