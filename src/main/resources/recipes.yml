@@ -1,0 +1,36 @@
+# ============================================================
+# Clover Blessing — Pressing Table recipes
+# Every press also needs one Clover Seed. 1-3 ingredients per recipe, matched in any order.
+# Rare recipes can only be pressed after learning them from a recipe scrap.
+# Item names are Bukkit material names. Reload with /clover admin reload.
+# ============================================================
+recipes:
+  # Offense
+  thornlash:        { ingredients: [ROSE_BUSH, CACTUS, IRON_INGOT] }
+  stinger:          { ingredients: [ARROW, SPIDER_EYE, STRING] }
+  # Defense
+  mossguard:        { ingredients: [MOSS_BLOCK, IRON_INGOT, LEATHER] }
+  last_leaf:        { ingredients: [GOLDEN_APPLE, BONE_BLOCK, LILY_PAD] }
+  # Mobility
+  springleaf:       { ingredients: [SLIME_BALL, FEATHER, SUGAR] }
+  fieldwalker:      { ingredients: [DANDELION, WHEAT, LEATHER] }
+  # Recovery
+  quiet_dew:        { ingredients: [GLISTERING_MELON_SLICE, KELP, SWEET_BERRIES] }
+  leechvine:        { ingredients: [VINE, SPIDER_EYE, ROTTEN_FLESH] }
+  # Crowd control
+  tangle_seed:      { ingredients: [VINE, STRING, ARROW] }
+  hobble:           { ingredients: [IRON_CHAIN, CACTUS, BONE] }
+  # Utility
+  waystem:          { ingredients: [COMPASS, ENDER_PEARL, OAK_SAPLING] }
+  lanternleaf:      { ingredients: [LANTERN, GLOW_BERRIES, GLOWSTONE_DUST] }
+  # Risk and reward
+  glass_bloom:      { ingredients: [GLASS, BLAZE_POWDER, POPPY] }
+  wager_root:       { ingredients: [GOLD_INGOT, EMERALD, RABBIT_FOOT] }
+  # Experimental (rare)
+  echo_leaf:        { ingredients: [ECHO_SHARD, AMETHYST_SHARD, SCULK], rare: true }
+  turning_year:     { ingredients: [CLOCK, BLUE_ORCHID, ALLIUM], rare: true }
+  # Curses (leaf 5)
+  bloodroot:        { ingredients: [WITHER_ROSE, BEETROOT, ROTTEN_FLESH] }
+  thorncrown:       { ingredients: [WITHER_ROSE, CACTUS, ROSE_BUSH] }
+  hollow_bell:      { ingredients: [WITHER_ROSE, GLOWSTONE_DUST, AMETHYST_SHARD] }
+  hungering_clover: { ingredients: [WITHER_ROSE, BONE, SPIDER_EYE] }

@@ -5,6 +5,8 @@ import net.cloversmp.cloverblessing.blessing.BlessingManager;
 import net.cloversmp.cloverblessing.blessing.BlessingRegistry;
 import net.cloversmp.cloverblessing.blessing.CooldownManager;
 import net.cloversmp.cloverblessing.charge.ChargeManager;
+import net.cloversmp.cloverblessing.crafting.ClaimService;
+import net.cloversmp.cloverblessing.crafting.RecipeRegistry;
 import net.cloversmp.cloverblessing.model.*;
 import net.cloversmp.cloverblessing.storage.DataManager;
 import net.kyori.adventure.text.Component;
@@ -33,7 +35,7 @@ public class Menus implements Listener {
 
     private static final Map<LeafSlot, Integer> LEAF_POSITIONS = Map.of(
             LeafSlot.LEAF_2, 13, LeafSlot.LEAF_1, 21, LeafSlot.LEAF_3, 23, LeafSlot.LEAF_4, 31, LeafSlot.CURSE, 40);
-    private static final int INFO_SLOT = 4, CENTER_SLOT = 22, HERBARIUM_SLOT = 49, BACK_SLOT = 49;
+    private static final int INFO_SLOT = 4, CENTER_SLOT = 22, HERBARIUM_SLOT = 49, GUIDE_SLOT = 47, BACK_SLOT = 49;
     private static final int[] PICKER_POSITIONS = {10, 12, 14, 16};
     private static final int HERBARIUM_PAGE = 45;
 
@@ -43,15 +45,20 @@ public class Menus implements Listener {
     private final ChargeManager charge;
     private final CooldownManager cooldowns;
     private final BlessingManager blessings;
+    private final ClaimService claims;
+    private final RecipeRegistry recipes;
 
     public Menus(CloverPlugin plugin, DataManager data, BlessingRegistry registry, ChargeManager charge,
-                 CooldownManager cooldowns, BlessingManager blessings) {
+                 CooldownManager cooldowns, BlessingManager blessings,
+                 ClaimService claims, RecipeRegistry recipes) {
         this.plugin = plugin;
         this.data = data;
         this.registry = registry;
         this.charge = charge;
         this.cooldowns = cooldowns;
         this.blessings = blessings;
+        this.claims = claims;
+        this.recipes = recipes;
     }
 
     // =====================================================================
@@ -75,6 +82,9 @@ public class Menus implements Listener {
                 line("Leaf 5 holds a curse pact.", NamedTextColor.DARK_PURPLE)));
 
         LEAF_POSITIONS.forEach((slot, pos) -> inv.setItem(pos, leafItem(clover, slot)));
+        inv.setItem(GUIDE_SLOT, item(Material.BOOK, text("Field Guide", NamedTextColor.GREEN),
+                line(clover.getDiscoveredRecipes().size() + " / " + recipes.all().size() + " recipes discovered", NamedTextColor.GRAY),
+                line("Press at a Pressing Table (a Fletching Table).", NamedTextColor.GRAY)));
         inv.setItem(HERBARIUM_SLOT, item(Material.BOOKSHELF, text("Herbarium", NamedTextColor.GREEN),
                 line(clover.getHerbarium().size() + " stored blessings", NamedTextColor.GRAY),
                 line("Click to browse and equip", NamedTextColor.YELLOW)));
@@ -120,7 +130,9 @@ public class Menus implements Listener {
         // shortcut: shows the first 45 blessings only; add paging once players hold more.
         for (Blessing b : clover.getHerbarium().values()) {
             if (i >= HERBARIUM_PAGE) break;
-            inv.setItem(i, blessingItem(clover, b, List.of(line("Click to equip", NamedTextColor.YELLOW))));
+            inv.setItem(i, blessingItem(clover, b, List.of(line("Left-click to equip", NamedTextColor.YELLOW),
+                    b.isBound() ? line("Bound to you (grafted): can't be taken out", NamedTextColor.DARK_GRAY)
+                            : line("Right-click to take it out as an item", NamedTextColor.YELLOW))));
             holder.blessingSlots().put(i++, b.getId());
         }
         if (i == 0) {
@@ -129,6 +141,37 @@ public class Menus implements Listener {
         }
         inv.setItem(BACK_SLOT, item(Material.ARROW, text("Back to your clover", NamedTextColor.YELLOW)));
         player.openInventory(inv);
+    }
+
+    /** Every recipe: discovered ones in full, the rest as silhouettes with category and ingredient hints. */
+    public void openFieldGuide(Player player) {
+        Clover clover = data.getClover(player.getUniqueId());
+        if (clover == null) return;
+        Inventory inv = create(new MenuHolder(MenuHolder.Kind.FIELD_GUIDE, null), 54, "☘ Field Guide");
+        int i = 0;
+        for (RecipeRegistry.Recipe r : recipes.all()) {
+            BlessingCore core = registry.getCore(r.coreId());
+            if (core == null || i >= HERBARIUM_PAGE) continue;
+            if (clover.hasDiscoveredRecipe(r.coreId())) {
+                inv.setItem(i++, item(materialFor(core.getCategory()), text(core.getDisplayName(), categoryColor(core.getCategory())),
+                        line(core.getCategory().getIcon() + " " + core.getCategory().getDisplayName() + (r.rare() ? " · rare" : ""),
+                                categoryColor(core.getCategory())),
+                        line(core.getRuleText(), NamedTextColor.WHITE),
+                        line("Clover Seed + " + String.join(", ", r.ingredients().stream().map(Menus::pretty).toList()),
+                                NamedTextColor.YELLOW)));
+            } else {
+                inv.setItem(i++, item(Material.GRAY_DYE, text("??? · " + core.getCategory().getDisplayName(), NamedTextColor.GRAY),
+                        line(r.rare() ? "Found in the world: look for a recipe scrap." : "Hints: "
+                                + String.join(", ", core.getIngredientHints()), NamedTextColor.DARK_GRAY)));
+            }
+        }
+        inv.setItem(BACK_SLOT, item(Material.ARROW, text("Back to your clover", NamedTextColor.YELLOW)));
+        player.openInventory(inv);
+    }
+
+    public static String pretty(Material m) {
+        String s = m.name().toLowerCase(java.util.Locale.ROOT).replace('_', ' ');
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
     public void openLeafPicker(Player player, Blessing blessing) {
@@ -148,7 +191,7 @@ public class Menus implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onClick(InventoryClickEvent event) {
-        if (!(event.getView().getTopInventory().getHolder() instanceof MenuHolder holder)) return;
+        if (!(event.getView().getTopInventory().getHolder() instanceof MenuHolder holder) || holder.kind().isTable()) return;
         event.setCancelled(true);
         if (!(event.getWhoClicked() instanceof Player player)) return;
         if (event.getClickedInventory() != event.getView().getTopInventory()) return;
@@ -160,6 +203,10 @@ public class Menus implements Listener {
             case CLOVER -> {
                 if (raw == HERBARIUM_SLOT) {
                     reopen(player, () -> openHerbarium(player));
+                    return;
+                }
+                if (raw == GUIDE_SLOT) {
+                    reopen(player, () -> openFieldGuide(player));
                     return;
                 }
                 LeafSlot slot = slotAt(raw);
@@ -184,6 +231,10 @@ public class Menus implements Listener {
                 Blessing b = id == null ? null : clover.getHerbarium().get(id);
                 BlessingCore core = b == null ? null : registry.getCore(b.getCoreId());
                 if (core == null) return;
+                if (event.isRightClick()) {
+                    if (claims.takeOut(player, b.getId())) reopen(player, () -> openHerbarium(player));
+                    return;
+                }
                 if (core.isCurse()) {
                     if (clover.getEquippedBlessing(LeafSlot.CURSE) != null && !event.isShiftClick()) {
                         player.sendMessage(Component.text("Shift-click to replace your curse; breaking a pact costs charge.",
@@ -195,6 +246,9 @@ public class Menus implements Listener {
                 } else {
                     reopen(player, () -> openLeafPicker(player, b));
                 }
+            }
+            case FIELD_GUIDE -> {
+                if (raw == BACK_SLOT) reopen(player, () -> openClover(player));
             }
             case LEAF_PICKER -> {
                 if (raw == 22) {
@@ -214,7 +268,7 @@ public class Menus implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onDrag(InventoryDragEvent event) {
-        if (event.getView().getTopInventory().getHolder() instanceof MenuHolder) event.setCancelled(true);
+        if (event.getView().getTopInventory().getHolder() instanceof MenuHolder h && !h.kind().isTable()) event.setCancelled(true);
     }
 
     /** Opening an inventory inside a click handler is unsafe, so swap menus on the next tick. */
@@ -231,7 +285,7 @@ public class Menus implements Listener {
     // Items
     // =====================================================================
 
-    private ItemStack blessingItem(Clover clover, Blessing b, List<Component> extra) {
+    public ItemStack blessingItem(Clover clover, Blessing b, List<Component> extra) {
         BlessingCore core = registry.getCore(b.getCoreId());
         if (core == null) {
             return item(Material.BARRIER, text("Unknown blessing: " + b.getCoreId(), NamedTextColor.RED));
@@ -282,13 +336,13 @@ public class Menus implements Listener {
         };
     }
 
-    private static Inventory create(MenuHolder holder, int size, String title) {
+    public static Inventory create(MenuHolder holder, int size, String title) {
         Inventory inv = Bukkit.createInventory(holder, size, text(title, NamedTextColor.DARK_GREEN));
         holder.setInventory(inv);
         return inv;
     }
 
-    private static ItemStack item(Material material, Component name, Component... lore) {
+    public static ItemStack item(Material material, Component name, Component... lore) {
         ItemStack stack = new ItemStack(material);
         ItemMeta meta = stack.getItemMeta();
         meta.displayName(name);
@@ -297,11 +351,11 @@ public class Menus implements Listener {
         return stack;
     }
 
-    private static Component text(String s, TextColor color) {
+    public static Component text(String s, TextColor color) {
         return Component.text(s, color).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.BOLD, true);
     }
 
-    private static Component line(String s, TextColor color) {
+    public static Component line(String s, TextColor color) {
         return Component.text(s, color).decoration(TextDecoration.ITALIC, false);
     }
 

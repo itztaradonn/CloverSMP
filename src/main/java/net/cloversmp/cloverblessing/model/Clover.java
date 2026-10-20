@@ -136,6 +136,11 @@ public class Clover {
         herbarium.put(blessing.getId(), blessing);
     }
 
+    /** @return the removed blessing, or null if it was not in the herbarium */
+    public Blessing removeFromHerbarium(UUID blessingId) {
+        return herbarium.remove(blessingId);
+    }
+
     /** Removes every blessing (equipped and stored) and the state they kept. */
     public void clearBlessings() {
         equippedBlessings.clear();

@@ -66,6 +66,12 @@ public class DataManager {
         return clover;
     }
 
+    /** Saves one player's Clover right now (after ledger changes, so a crash can't split the two). */
+    public void saveNow(UUID uuid) {
+        Clover clover = cache.get(uuid);
+        if (clover != null) write(uuid, serialize(clover));
+    }
+
     /** Saves and drops a player's Clover from the cache (on quit). */
     public void unloadClover(UUID uuid) {
         Clover clover = cache.remove(uuid);

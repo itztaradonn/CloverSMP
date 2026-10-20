@@ -4,6 +4,7 @@ import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.blessing.BlessingManager;
 import net.cloversmp.cloverblessing.blessing.BlessingRegistry;
 import net.cloversmp.cloverblessing.charge.ChargeManager;
+import net.cloversmp.cloverblessing.crafting.CloverItems;
 import net.cloversmp.cloverblessing.model.*;
 import net.cloversmp.cloverblessing.party.PartyManager;
 import net.cloversmp.cloverblessing.storage.DataManager;
@@ -36,9 +37,10 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
     private final ChargeManager charge;
     private final PartyManager parties;
     private final Menus menus;
+    private final CloverItems items;
 
     public CloverCommand(CloverPlugin plugin, DataManager data, BlessingRegistry registry, BlessingManager blessings,
-                         ChargeManager charge, PartyManager parties, Menus menus) {
+                         ChargeManager charge, PartyManager parties, Menus menus, CloverItems items) {
         this.plugin = plugin;
         this.data = data;
         this.registry = registry;
@@ -46,6 +48,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         this.charge = charge;
         this.parties = parties;
         this.menus = menus;
+        this.items = items;
     }
 
     @Override
@@ -70,7 +73,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         msg(s, "/clover inspect <player> — see someone's leaves", NamedTextColor.GRAY);
         msg(s, "/clover party invite|accept|leave|kick|list", NamedTextColor.GRAY);
         if (s.hasPermission("clover.admin")) {
-            msg(s, "/clover admin give|setcharge|reset|reload ...", NamedTextColor.GRAY);
+            msg(s, "/clover admin give|seed|scrap|setcharge|reset|reload ...", NamedTextColor.GRAY);
         }
     }
 
@@ -196,14 +199,14 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         String action = args.length < 2 ? "" : args[1].toLowerCase(Locale.ROOT);
         if (action.equals("reload")) {
             if (!require(s, "clover.admin.reload")) return;
-            plugin.reloadConfig();
-            msg(s, "Clover config reloaded.", NamedTextColor.GREEN);
+            plugin.reloadAll();
+            msg(s, "Clover config and recipes reloaded. Check the console for recipe warnings.", NamedTextColor.GREEN);
             return;
         }
         Player target = args.length < 3 ? null : Bukkit.getPlayerExact(args[2]);
         Clover clover = target == null ? null : data.getClover(target.getUniqueId());
         if (clover == null) {
-            msg(s, "Usage: /clover admin <give|setcharge|reset> <online player> ...", NamedTextColor.RED);
+            msg(s, "Usage: /clover admin <give|seed|scrap|setcharge|reset> <online player> ...", NamedTextColor.RED);
             return;
         }
         switch (action) {
@@ -231,6 +234,25 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
                         + (graft != null ? " (" + graft.getDisplayName() + ")" : "") + ".", NamedTextColor.GREEN);
                 if (s != target) msg(target, "You received " + core.getDisplayName() + ". Open /clover to equip it.", NamedTextColor.GREEN);
             }
+            case "seed" -> {
+                int amount = 16;
+                try {
+                    if (args.length >= 4) amount = Math.max(1, Math.min(64, Integer.parseInt(args[3])));
+                } catch (NumberFormatException ignored) {
+                    // keep the default
+                }
+                target.getInventory().addItem(items.seed(amount));
+                msg(s, "Gave " + target.getName() + " " + amount + " Clover Seeds.", NamedTextColor.GREEN);
+            }
+            case "scrap" -> {
+                BlessingCore core = args.length < 4 ? null : registry.getCore(args[3].toLowerCase(Locale.ROOT));
+                if (core == null) {
+                    msg(s, "Usage: /clover admin scrap <player> <core>", NamedTextColor.RED);
+                    return;
+                }
+                target.getInventory().addItem(items.scrap(core));
+                msg(s, "Gave " + target.getName() + " a recipe scrap for " + core.getDisplayName() + ".", NamedTextColor.GREEN);
+            }
             case "setcharge" -> {
                 if (!require(s, "clover.admin.setcharge")) return;
                 try {
@@ -250,7 +272,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
                 plugin.getLogger().info(s.getName() + " reset the clover of " + target.getName());
                 msg(s, "Reset " + target.getName() + "'s clover.", NamedTextColor.YELLOW);
             }
-            default -> msg(s, "Usage: /clover admin <give|setcharge|reset|reload>", NamedTextColor.RED);
+            default -> msg(s, "Usage: /clover admin <give|seed|scrap|setcharge|reset|reload>", NamedTextColor.RED);
         }
     }
 
@@ -274,12 +296,14 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
             case 2 -> switch (args[0].toLowerCase(Locale.ROOT)) {
                 case "inspect" -> onlineNames();
                 case "party" -> List.of("invite", "accept", "leave", "kick", "list");
-                case "admin" -> sender.hasPermission("clover.admin") ? List.of("give", "setcharge", "reset", "reload") : List.of();
+                case "admin" -> sender.hasPermission("clover.admin")
+                        ? List.of("give", "seed", "scrap", "setcharge", "reset", "reload") : List.of();
                 default -> List.of();
             };
             case 3 -> args[0].equalsIgnoreCase("admin") || args[1].equalsIgnoreCase("invite")
                     || args[1].equalsIgnoreCase("kick") ? onlineNames() : List.of();
-            case 4 -> args[0].equalsIgnoreCase("admin") && args[1].equalsIgnoreCase("give")
+            case 4 -> args[0].equalsIgnoreCase("admin")
+                    && (args[1].equalsIgnoreCase("give") || args[1].equalsIgnoreCase("scrap"))
                     ? registry.getAllCores().stream().map(BlessingCore::getId).toList() : List.of();
             case 5 -> args[0].equalsIgnoreCase("admin") && args[1].equalsIgnoreCase("give")
                     ? Stream.of(Graft.values()).map(g -> g.name().toLowerCase(Locale.ROOT)).toList() : List.of();

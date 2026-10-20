@@ -38,7 +38,7 @@ so tagged items can't be spent as plain paper. The tag is the only identity; nam
 A blessing record is always in exactly one place: a player's herbarium/leaves, or **out as an item**.
 
 - `plugins/CloverBlessing/ledger.json` holds every blessing currently out as an item: blessing id → record.
-- **Take out** (herbarium menu, shift-click): only unbound, unequipped blessings. Removes it from the herbarium,
+- **Take out** (herbarium menu, right-click; shift-click already confirms curse swaps): only unbound, unequipped blessings. Removes it from the herbarium,
   adds it to the ledger, gives a claim item carrying only the blessing id. Fails with "inventory full"
   instead of dropping it.
 - **Redeem** (right-click the claim): if the id is in the ledger, remove it from the ledger, set the owner to
@@ -144,7 +144,7 @@ A `/clover` menu page listing every recipe:
 | `crafting/PressingTableMenu` | The two-tab table menu (MenuHolder kinds `PRESS`, `GRAFT`), input return on close |
 | `crafting/ScrapListener` | Loot and boss scrap drops |
 | `crafting/CraftLog` | Async append to `ledger.log` |
-| `ui/Menus` | Add Field Guide page, herbarium shift-click "take out" |
+| `ui/Menus` | Add Field Guide page, herbarium right-click "take out" |
 
 ## Testing
 

@@ -102,10 +102,33 @@ balance:
   # No blessing can reduce damage from a single source by more than this %
   max-single-source-reduction-percent: 50
 
-# --- Crafting ---
+# --- Crafting (Pressing Table = any Fletching Table; recipes live in recipes.yml) ---
 crafting:
-  # Graft prune refund percentage
+  # Pruning a graft refunds this % of the Pollen and of the graft materials (rounded down)
   prune-refund-percent: 50
+  # Shapeless crafting recipe for one Clover Seed
+  seed-recipe: [WHEAT_SEEDS, BONE_MEAL, EMERALD]
+
+# --- Grafts ---
+graft:
+  # Pollen per graft (Pollen comes from charge above the max)
+  pollen-cost: 100
+  # How many of the graft's material it costs: Quick = Phantom Membrane, Deep = Diamond,
+  # Hunter = Breeze Rod, Vengeful = Wither Skeleton Skull, Ward = Heart of the Sea
+  material-count: 2
+
+# --- Recipe scraps (teach rare recipes) ---
+scraps:
+  # Loot table key -> chance a generated chest also holds a scrap
+  loot-tables:
+    chests/ancient_city: 0.05
+    chests/end_city_treasure: 0.05
+    chests/bastion_treasure: 0.05
+  # Boss type -> chance it drops a scrap when killed by a player
+  bosses:
+    ENDER_DRAGON: 1.0
+    WITHER: 0.5
+    WARDEN: 0.25
 
 # --- UI ---
 ui:

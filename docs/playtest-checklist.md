@@ -6,9 +6,9 @@ For testing with fresh accounts, set `anti-abuse.min-victim-playtime-hours: 0` (
 Setup: `/clover admin setcharge <you> 1000`, then `/clover admin give <you> <core> [graft]` and equip from `/clover`.
 
 ## Core
-- [ ] Plugin enables; log says "20 blessings and curses"; no errors on join, quit, `/clover admin reload`, server stop
-- [ ] Action bar shows leaves, category icons, cooldown seconds, ⚡charge
-- [ ] Particle ring shows leaf count; a curse adds dark ink motes
+- [ ✅ ] Plugin enables; log says "20 blessings and curses"; no errors on join, quit, `/clover admin reload`, server stop
+- [ ✅] Action bar shows leaves, category icons, cooldown seconds, ⚡charge
+- [ ]✅ Particle ring shows leaf count; a curse adds dark ink motes
 - [ ] Equip blocked within 30 s of PvP; new blessing "wakes in 30s"
 - [ ] Charge 790 + mob kills stays at 799; a player kill opens leaf 4
 - [ ] Death at 1000 → 650; at 120 → 100 (floor); Wager Root doubles the loss
@@ -41,3 +41,19 @@ Setup: `/clover admin setcharge <you> 1000`, then `/clover admin give <you> <cor
 - [ ] Thorncrown: deal more, take more from players
 - [ ] Hollow Bell: you glow; cooldowns shorter (never below 70 %)
 - [ ] Hungering Clover: hunger drains twice as fast; blessings stronger
+
+## Phase 2: crafting
+Setup: `/clover admin seed <you> 16`, `/clover admin scrap <you> echo_leaf`, `/clover admin setcharge <you> 1000` and kill mobs for Pollen.
+- [ ] Clover Seed shows in the recipe book; Wheat Seeds + Bone Meal + Emerald crafts one
+- [ ] Seeds and claims can't be planted, crafted with, or used in a cartography table
+- [ ] Right-click a Fletching Table opens the Pressing Table (sneak-click places blocks as normal)
+- [ ] Seed + Rose Bush + Cactus + Iron Ingot previews Thornlash; Press adds it to the herbarium and the Field Guide
+- [ ] Wrong ingredients show "No recipe matches"; no seed shows the reason; Press does nothing
+- [ ] Echo Leaf ingredients say "haven't learned"; after right-clicking its scrap they press
+- [ ] Closing the table (Esc, logout, /stop) returns everything in the input slots
+- [ ] Graft tab: grafting costs 100 Pollen + 2 materials and binds; pruning refunds 50 Pollen + 1 material
+- [ ] Herbarium right-click takes an unbound blessing out as an item; another player right-clicks it to redeem
+- [ ] A duplicated claim (creative middle-click) is void on use and logged in `plugins/CloverBlessing/ledger.log`
+- [ ] Field Guide shows discovered recipes in full, others as ??? with hints
+- [ ] Every Curse recipe needs a Wither Rose
+- [ ] A killed Ender Dragon drops a recipe scrap
