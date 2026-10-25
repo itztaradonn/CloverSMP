@@ -6,272 +6,137 @@
   },
   "blessing.stinger": {
     "sounds": [
-      {
-        "name": "minecraft:entity.bee.sting",
-        "type": "event",
-        "pitch": 1.2,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/stinger"
     ]
   },
   "blessing.mossguard": {
     "sounds": [
-      {
-        "name": "minecraft:block.moss.place",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/mossguard"
     ]
   },
   "blessing.last_leaf": {
     "sounds": [
-      {
-        "name": "minecraft:item.totem.use",
-        "type": "event",
-        "pitch": 1.6,
-        "volume": 0.5
-      }
+      "cloverblessing:blessing/last_leaf"
     ]
   },
   "blessing.springleaf": {
     "sounds": [
-      {
-        "name": "minecraft:entity.slime.jump",
-        "type": "event",
-        "pitch": 1.2,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/springleaf"
     ]
   },
   "blessing.quiet_dew": {
     "sounds": [
-      {
-        "name": "minecraft:block.amethyst_block.chime",
-        "type": "event",
-        "pitch": 1.8,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/quiet_dew"
     ]
   },
   "blessing.leechvine": {
     "sounds": [
-      {
-        "name": "minecraft:entity.generic.drink",
-        "type": "event",
-        "pitch": 0.7,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/leechvine"
     ]
   },
   "blessing.tangle_seed": {
     "sounds": [
-      {
-        "name": "minecraft:block.cave_vines.place",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/tangle_seed"
     ]
   },
   "blessing.hobble": {
     "sounds": [
-      {
-        "name": "minecraft:item.armor.equip_chain",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/hobble"
     ]
   },
   "blessing.waystem_plant": {
     "sounds": [
-      {
-        "name": "minecraft:block.azalea.place",
-        "type": "event",
-        "pitch": 1.0,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/waystem_plant"
     ]
   },
   "blessing.waystem_recall": {
     "sounds": [
-      {
-        "name": "minecraft:entity.enderman.teleport",
-        "type": "event",
-        "pitch": 1.2,
-        "volume": 0.8
-      }
+      "cloverblessing:blessing/waystem_recall"
     ]
   },
   "blessing.glass_bloom": {
     "sounds": [
-      {
-        "name": "minecraft:block.glass.hit",
-        "type": "event",
-        "pitch": 1.6,
-        "volume": 0.6
-      }
+      "cloverblessing:blessing/glass_bloom"
     ]
   },
   "blessing.wager_root_win": {
     "sounds": [
-      {
-        "name": "minecraft:entity.player.levelup",
-        "type": "event",
-        "pitch": 1.8,
-        "volume": 0.4
-      }
+      "cloverblessing:blessing/wager_root_win"
     ]
   },
   "blessing.wager_root_loss": {
     "sounds": [
-      {
-        "name": "minecraft:block.wood.break",
-        "type": "event",
-        "pitch": 0.6,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/wager_root_loss"
     ]
   },
   "blessing.turning_year": {
     "sounds": [
-      {
-        "name": "minecraft:block.amethyst_block.resonate",
-        "type": "event",
-        "pitch": 1.0,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/turning_year"
     ]
   },
   "curse.bloodroot": {
     "sounds": [
-      {
-        "name": "minecraft:entity.warden.heartbeat",
-        "type": "event",
-        "pitch": 1.2,
-        "volume": 1.0
-      }
+      "cloverblessing:curse/bloodroot"
     ]
   },
   "curse.thorncrown": {
     "sounds": [
-      {
-        "name": "minecraft:enchant.thorns.hit",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 1.0
-      }
+      "cloverblessing:curse/thorncrown"
     ]
   },
   "curse.hollow_bell": {
     "sounds": [
-      {
-        "name": "minecraft:block.bell.use",
-        "type": "event",
-        "pitch": 0.5,
-        "volume": 1.0
-      }
+      "cloverblessing:curse/hollow_bell"
     ]
   },
   "curse.hungering_clover": {
     "sounds": [
-      {
-        "name": "minecraft:entity.player.burp",
-        "type": "event",
-        "pitch": 0.5,
-        "volume": 1.0
-      }
+      "cloverblessing:curse/hungering_clover"
     ]
   },
   "clover.leaf_open": {
     "sounds": [
-      {
-        "name": "minecraft:entity.player.levelup",
-        "type": "event",
-        "pitch": 1.4,
-        "volume": 0.6
-      }
+      "cloverblessing:clover/leaf_open"
     ]
   },
   "clover.leaf_wilt": {
     "sounds": [
-      {
-        "name": "minecraft:block.grass.break",
-        "type": "event",
-        "pitch": 0.6,
-        "volume": 1.0
-      }
+      "cloverblessing:clover/leaf_wilt"
     ]
   },
   "clover.pact_take": {
     "sounds": [
-      {
-        "name": "minecraft:entity.elder_guardian.curse",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 0.5
-      }
+      "cloverblessing:clover/pact_take"
     ]
   },
   "clover.pact_break": {
     "sounds": [
-      {
-        "name": "minecraft:block.glass.break",
-        "type": "event",
-        "pitch": 0.6,
-        "volume": 1.0
-      }
+      "cloverblessing:clover/pact_break"
     ]
   },
   "craft.press": {
     "sounds": [
-      {
-        "name": "minecraft:block.composter.fill_success",
-        "type": "event",
-        "pitch": 1.0,
-        "volume": 1.0
-      }
+      "cloverblessing:craft/press"
     ]
   },
   "craft.graft": {
     "sounds": [
-      {
-        "name": "minecraft:block.smithing_table.use",
-        "type": "event",
-        "pitch": 1.2,
-        "volume": 1.0
-      }
+      "cloverblessing:craft/graft"
     ]
   },
   "craft.prune": {
     "sounds": [
-      {
-        "name": "minecraft:entity.sheep.shear",
-        "type": "event",
-        "pitch": 1.0,
-        "volume": 1.0
-      }
+      "cloverblessing:craft/prune"
     ]
   },
   "charge.gain": {
     "sounds": [
-      {
-        "name": "minecraft:entity.experience_orb.pickup",
-        "type": "event",
-        "pitch": 1.6,
-        "volume": 0.3
-      }
+      "cloverblessing:charge/gain"
     ]
   },
   "ui.blessing_ready": {
     "sounds": [
-      {
-        "name": "minecraft:block.note_block.bell",
-        "type": "event",
-        "pitch": 2.0,
-        "volume": 0.4
-      }
+      "cloverblessing:ui/blessing_ready"
     ]
   }
 }

@@ -8,7 +8,6 @@ plays a vanilla placeholder. Run it, then ./gradlew resourcePack, whenever files
 """
 import json
 import pathlib
-import shutil
 import subprocess
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -47,9 +46,7 @@ SOUNDS = {
     "ui.blessing_ready": ("block.note_block.bell", 2.0, 0.4),
 }
 
-out_dir = PACK / "sounds"
-if out_dir.exists():
-    shutil.rmtree(out_dir)
+out_dir = PACK / "sounds"  # files are overwritten in place (Windows editors can lock folders against deletion)
 entries, custom = {}, 0
 for name, (event, pitch, volume) in SOUNDS.items():
     src = next((p for ext in ("mp3", "wav", "ogg", "flac") if (p := SRC / f"{name}.{ext}").exists()), None)

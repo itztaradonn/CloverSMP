@@ -31,4 +31,4 @@ Save each file as `art/sfx/<name>.mp3` (or .wav). Every sound: a single one-shot
 | craft.graft | 1.0s | Magical shimmer with a soft blacksmith tap, binding something together |
 | craft.prune | 0.5s | Crisp garden shears snip cutting a stem |
 | charge.gain | 0.5s | Soft quick rising electric blip, gentle energy pickup, quiet |
-| ui.blessing_ready | 0.4s | Tiny soft bell ding, an ability becoming ready, subtle |
+| ui.blessing_ready | 0.5s | Tiny soft bell ding, an ability becoming ready, subtle |
