@@ -80,7 +80,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         msg(s, "/clover inspect <player> — see someone's leaves", NamedTextColor.GRAY);
         msg(s, "/clover party invite|accept|leave|kick|list", NamedTextColor.GRAY);
         if (s.hasPermission("clover.admin")) {
-            msg(s, "/clover admin menu|debug|stats|give|seed|scrap|setcharge|reset|reload ...", NamedTextColor.GRAY);
+            msg(s, "/clover admin menu|debug|stats|resetcooldowns|give|seed|scrap|setcharge|reset|reload ...", NamedTextColor.GRAY);
         }
     }
 
@@ -267,6 +267,22 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
                         + (graft != null ? " (" + graft.getDisplayName() + ")" : "") + ".", NamedTextColor.GREEN);
                 if (s != target) msg(target, "You received " + core.getDisplayName() + ". Open /clover to equip it.", NamedTextColor.GREEN);
             }
+            case "resetcooldowns" -> {
+                String which = args.length >= 4 ? args[3].toLowerCase(Locale.ROOT) : "all";
+                switch (which) {
+                    case "skills" -> clover.clearCooldowns();
+                    case "wakes" -> clover.clearWakes();
+                    case "all" -> {
+                        clover.clearCooldowns();
+                        clover.clearWakes();
+                    }
+                    default -> {
+                        msg(s, "Usage: /clover admin resetcooldowns <player> [skills|wakes|all]", NamedTextColor.RED);
+                        return;
+                    }
+                }
+                msg(s, "Reset " + which + " for " + target.getName() + ".", NamedTextColor.GREEN);
+            }
             case "seed" -> {
                 int amount = 16;
                 try {
@@ -305,7 +321,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
                 plugin.getLogger().info(s.getName() + " reset the clover of " + target.getName());
                 msg(s, "Reset " + target.getName() + "'s clover.", NamedTextColor.YELLOW);
             }
-            default -> msg(s, "Usage: /clover admin <menu|debug|stats|give|seed|scrap|setcharge|reset|reload>", NamedTextColor.RED);
+            default -> msg(s, "Usage: /clover admin <menu|debug|stats|resetcooldowns|give|seed|scrap|setcharge|reset|reload>", NamedTextColor.RED);
         }
     }
 
@@ -330,13 +346,14 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
                 case "inspect" -> onlineNames();
                 case "party" -> List.of("invite", "accept", "leave", "kick", "list");
                 case "admin" -> sender.hasPermission("clover.admin")
-                        ? List.of("menu", "debug", "stats", "give", "seed", "scrap", "setcharge", "reset", "reload") : List.of();
+                        ? List.of("menu", "debug", "stats", "resetcooldowns", "give", "seed", "scrap", "setcharge", "reset", "reload") : List.of();
                 default -> List.of();
             };
             case 3 -> args[0].equalsIgnoreCase("admin") || args[1].equalsIgnoreCase("invite")
                     || args[1].equalsIgnoreCase("kick") ? onlineNames() : List.of();
-            case 4 -> args[0].equalsIgnoreCase("admin")
-                    && (args[1].equalsIgnoreCase("give") || args[1].equalsIgnoreCase("scrap"))
+            case 4 -> !args[0].equalsIgnoreCase("admin") ? List.of()
+                    : args[1].equalsIgnoreCase("resetcooldowns") ? List.of("skills", "wakes", "all")
+                    : args[1].equalsIgnoreCase("give") || args[1].equalsIgnoreCase("scrap")
                     ? registry.getAllCores().stream().map(BlessingCore::getId).toList() : List.of();
             case 5 -> args[0].equalsIgnoreCase("admin") && args[1].equalsIgnoreCase("give")
                     ? Stream.of(Graft.values()).map(g -> g.name().toLowerCase(Locale.ROOT)).toList() : List.of();

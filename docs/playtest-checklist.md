@@ -80,3 +80,8 @@ Sounds are placeholders until your ElevenLabs files are in `art/sfx/` (see `docs
 - [ ] `/clover admin stats` opens a menu: pick % and kill share % per blessing, with counts
 - [ ] After 10 min with a 4-leaf player online, loadouts sampled goes up; a PvP kill by a 4-leaf player adds a kill
 - [ ] Over 40% pick or 55% kill share (with 20+ samples) shows red with a glint; `/clover admin stats reset` clears it
+
+## Cooldowns
+- [ ] A boss bar lists blessings that are cooling down or waking ("Thornlash 12s · Stinger 3s (waking)"), yellow while waking, green otherwise; it hides when all are ready
+- [ ] 30 s after equipping, chat says "✿ <blessing> has awakened." with a ding
+- [ ] `/cl admin resetcooldowns <player> skills|wakes|all` clears just that kind

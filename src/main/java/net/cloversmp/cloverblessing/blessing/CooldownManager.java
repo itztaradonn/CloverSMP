@@ -19,7 +19,20 @@ public class CooldownManager {
         return getRemainingMs(clover, blessingId) > 0;
     }
 
+    /** Time until the blessing can fire: the longer of its cooldown and its wake-up. */
     public long getRemainingMs(Clover clover, UUID blessingId) {
+        return Math.max(getCooldownMs(clover, blessingId), getWakeMs(clover, blessingId));
+    }
+
+    public long getCooldownMs(Clover clover, UUID blessingId) {
         return Math.max(0, clover.getCooldownExpiry(blessingId) - System.currentTimeMillis());
+    }
+
+    public long getWakeMs(Clover clover, UUID blessingId) {
+        return Math.max(0, clover.getWakeExpiry(blessingId) - System.currentTimeMillis());
+    }
+
+    public void startWake(Clover clover, UUID blessingId, long durationMs) {
+        clover.setWakeExpiry(blessingId, System.currentTimeMillis() + durationMs);
     }
 }

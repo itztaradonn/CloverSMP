@@ -74,9 +74,7 @@ public class BlessingManager {
             Effects.particles(Effects.body(player, 1.0), org.bukkit.Particle.SOUL_FIRE_FLAME, 8, 0.2);
         }
         long lockMs = plugin.getConfig().getLong("loadout.swap-lock-seconds", 30) * 1000L;
-        if (cooldownManager.getRemainingMs(clover, blessingId) < lockMs) {
-            cooldownManager.startCooldown(clover, blessingId, lockMs);
-        }
+        cooldownManager.startWake(clover, blessingId, lockMs);
         player.sendMessage(Component.text("Equipped ", NamedTextColor.GREEN)
                 .append(Component.text(core.getDisplayName(), NamedTextColor.GOLD))
                 .append(Component.text(" to " + slot.label() + ". It wakes in "

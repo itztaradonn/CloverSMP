@@ -20,6 +20,11 @@ public class Clover {
     private long lastCombatMs;
     /** Blessing id → wall-clock millis when its cooldown ends. */
     private final Map<UUID, Long> cooldownExpiry = new HashMap<>();
+    /**
+     * Blessing id → millis when a freshly equipped blessing wakes. Kept apart from cooldowns so admins can reset
+     * either. shortcut: not saved, so relogging skips the rest of a wake-up; persist it if players abuse that.
+     */
+    private final Map<UUID, Long> wakeExpiry = new HashMap<>();
     private int dailyMobCharge;
     private long dailyMobChargeResetDay;
     private final Map<String, Integer> dailyBossKills = new HashMap<>();
@@ -146,6 +151,7 @@ public class Clover {
         equippedBlessings.clear();
         herbarium.clear();
         cooldownExpiry.clear();
+        wakeExpiry.clear();
         handlerData.clear();
     }
 
@@ -181,6 +187,22 @@ public class Clover {
 
     public void setCooldownExpiry(UUID blessingId, long expiryMs) {
         cooldownExpiry.put(blessingId, expiryMs);
+    }
+
+    public long getWakeExpiry(UUID blessingId) {
+        return wakeExpiry.getOrDefault(blessingId, 0L);
+    }
+
+    public void setWakeExpiry(UUID blessingId, long expiryMs) {
+        wakeExpiry.put(blessingId, expiryMs);
+    }
+
+    public void clearCooldowns() {
+        cooldownExpiry.clear();
+    }
+
+    public void clearWakes() {
+        wakeExpiry.clear();
     }
 
     /** Snapshot of unexpired cooldowns; expired entries are dropped. */

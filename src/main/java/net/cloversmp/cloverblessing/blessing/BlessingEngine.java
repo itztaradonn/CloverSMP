@@ -175,7 +175,8 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
             String result;
             long cooldown = cooldownManager.getRemainingMs(ctx.clover(), ctx.instanceId());
             BlessingHandler h = registry.getHandler(ctx.core().getId());
-            if (cooldown > 0) result = "cooldown " + (cooldown / 1000 + 1) + "s";
+            if (cooldown > 0) result = (cooldownManager.getWakeMs(ctx.clover(), ctx.instanceId()) > 0 ? "waking " : "cooldown ")
+                    + (cooldown / 1000 + 1) + "s";
             else if (h == null) result = "no handler";
             else if (hook.call(h, ctx)) {
                 fire(ctx);
@@ -470,17 +471,28 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
         }
     }
 
-    /** A quiet private ding when an equipped blessing comes off cooldown during the last second. */
+    /**
+     * A quiet private ding when an equipped blessing became usable during the last second, plus a chat line when
+     * that was the end of its wake-up after equipping.
+     */
     private void readyDing(Player player, long now) {
         Clover clover = dataManager.getClover(player.getUniqueId());
         if (clover == null) return;
+        boolean ding = false;
         for (var e : clover.getEquippedBlessings().entrySet()) {
-            long expiry = clover.getCooldownExpiry(e.getValue().getId());
-            if (!e.getKey().isCurse() && expiry > now - 1_000 && expiry <= now) {
-                Effects.privateSound(player, "ui.blessing_ready", 0.6f);
-                return;
+            if (e.getKey().isCurse()) continue;
+            Blessing b = e.getValue();
+            long woke = clover.getWakeExpiry(b.getId());
+            if (woke > now - 1_000 && woke <= now && cooldownManager.getCooldownMs(clover, b.getId()) == 0) {
+                BlessingCore core = registry.getCore(b.getCoreId());
+                player.sendMessage(net.kyori.adventure.text.Component.text("✿ " + (core != null ? core.getDisplayName() : b.getCoreId())
+                        + " has awakened.", net.kyori.adventure.text.format.NamedTextColor.GREEN));
+                ding = true;
             }
+            long cd = clover.getCooldownExpiry(b.getId());
+            if (cd > now - 1_000 && cd <= now && cooldownManager.getWakeMs(clover, b.getId()) == 0) ding = true;
         }
+        if (ding) Effects.privateSound(player, "ui.blessing_ready", 0.6f);
     }
 
     private void applyStats(Player player, StatSink stats) {

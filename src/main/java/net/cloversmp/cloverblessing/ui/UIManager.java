@@ -1,5 +1,7 @@
 package net.cloversmp.cloverblessing.ui;
 
+import java.util.*;
+import net.kyori.adventure.bossbar.BossBar;
 import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.blessing.BlessingEngine;
 import net.cloversmp.cloverblessing.blessing.BlessingRegistry;
@@ -60,9 +62,65 @@ public class UIManager {
     }
 
     private void tickActionBar() {
+        bars.keySet().removeIf(id -> Bukkit.getPlayer(id) == null);
         for (Player player : Bukkit.getOnlinePlayers()) {
             Clover clover = data.getClover(player.getUniqueId());
-            if (clover != null) player.sendActionBar(actionBar(clover));
+            if (clover == null) continue;
+            player.sendActionBar(actionBar(clover));
+            updateCooldownBar(player, clover);
+        }
+    }
+
+    private final Map<UUID, BossBar> bars = new HashMap<>();
+    /** Blessing id → the longest remaining time seen for its current cooldown, so the bar can show progress. */
+    private final Map<UUID, Long> totals = new HashMap<>();
+
+    /**
+     * A boss bar listing every open-leaf blessing that is cooling down or waking ("Thornlash 12s · Stinger 3s").
+     * The bar fill follows the longest one; yellow while that one is still waking, green otherwise. Hidden when
+     * everything is ready.
+     */
+    private void updateCooldownBar(Player player, Clover clover) {
+        List<String> parts = new ArrayList<>();
+        long longest = 0;
+        float progress = 0;
+        boolean waking = false;
+        for (var e : clover.getEquippedBlessings().entrySet()) {
+            if (e.getKey().isCurse() || !charge.isLeafActive(clover, e.getKey())) continue;
+            Blessing b = e.getValue();
+            long remaining = cooldowns.getRemainingMs(clover, b.getId());
+            if (remaining <= 0) {
+                totals.remove(b.getId());
+                continue;
+            }
+            long total = totals.merge(b.getId(), remaining, Math::max);
+            boolean wake = cooldowns.getWakeMs(clover, b.getId()) >= remaining;
+            BlessingCore core = registry.getCore(b.getCoreId());
+            parts.add((core != null ? core.getDisplayName() : b.getCoreId()) + " " + (remaining / 1000 + 1) + "s"
+                    + (wake ? " (waking)" : ""));
+            if (remaining > longest) {
+                longest = remaining;
+                progress = (float) remaining / total;
+                waking = wake;
+            }
+        }
+        BossBar bar = bars.get(player.getUniqueId());
+        if (parts.isEmpty()) {
+            if (bar != null) {
+                player.hideBossBar(bar);
+                bars.remove(player.getUniqueId());
+            }
+            return;
+        }
+        Component title = Component.text(String.join("  ·  ", parts), NamedTextColor.WHITE);
+        BossBar.Color color = waking ? BossBar.Color.YELLOW : BossBar.Color.GREEN;
+        float fill = Math.max(0f, Math.min(1f, progress));
+        if (bar == null) {
+            bar = BossBar.bossBar(title, fill, color, BossBar.Overlay.PROGRESS);
+            bars.put(player.getUniqueId(), bar);
+            player.showBossBar(bar);
+        } else {
+            bar.name(title).progress(fill).color(color);
         }
     }
 
