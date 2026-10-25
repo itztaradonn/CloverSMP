@@ -55,7 +55,7 @@ public class ChargeManager {
      */
     public void addCharge(Player player, int baseAmount, ChargeSource source, double multiplier) {
         Clover clover = dataManager.getClover(player.getUniqueId());
-        if (clover == null) return;
+        if (clover == null || !plugin.progressionAllowed()) return;
 
         int amount = (int) Math.round(baseAmount * multiplier * modifiers.gain(player));
         boolean mob = source == ChargeSource.HOSTILE_MOB || source == ChargeSource.ELITE_MOB;
@@ -101,7 +101,7 @@ public class ChargeManager {
     /** Death penalty: a percentage of the meter, never below the floor once leaf 2 is permanent. */
     public void applyDeathPenalty(Player player) {
         Clover clover = dataManager.getClover(player.getUniqueId());
-        if (clover == null) return;
+        if (clover == null || !plugin.progressionAllowed()) return;
         double percent = plugin.getConfig().getDouble("charge.death-penalty-percent", 35);
         int leavesBefore = getLeafCount(clover);
         double penaltyMultiplier = modifiers.deathPenalty(player);

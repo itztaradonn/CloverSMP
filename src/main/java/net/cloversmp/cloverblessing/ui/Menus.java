@@ -242,7 +242,8 @@ public class Menus implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onClick(InventoryClickEvent event) {
-        if (!(event.getView().getTopInventory().getHolder() instanceof MenuHolder holder) || holder.kind().isTable()) return;
+        if (!(event.getView().getTopInventory().getHolder() instanceof MenuHolder holder) || holder.kind().isTable()
+                || holder.kind() == MenuHolder.Kind.SMP_SETTINGS) return;
         event.setCancelled(true);
         if (!(event.getWhoClicked() instanceof Player player)) return;
         if (event.getClickedInventory() != event.getView().getTopInventory()) return;
@@ -334,7 +335,8 @@ public class Menus implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onDrag(InventoryDragEvent event) {
-        if (event.getView().getTopInventory().getHolder() instanceof MenuHolder h && !h.kind().isTable()) event.setCancelled(true);
+        if (event.getView().getTopInventory().getHolder() instanceof MenuHolder h && !h.kind().isTable()
+                && h.kind() != MenuHolder.Kind.SMP_SETTINGS) event.setCancelled(true);
     }
 
     /** Opening an inventory inside a click handler is unsafe, so swap menus on the next tick. */

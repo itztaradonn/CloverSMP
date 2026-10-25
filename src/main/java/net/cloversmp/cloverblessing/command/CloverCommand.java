@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.command;
 
+import net.cloversmp.cloverblessing.smp.SmpService;
 import net.cloversmp.cloverblessing.stats.StatsService;
 import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.blessing.BlessingEngine;
@@ -42,10 +43,11 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
     private final CloverItems items;
     private final BlessingEngine engine;
     private final StatsService stats;
+    private final SmpService smp;
 
     public CloverCommand(CloverPlugin plugin, DataManager data, BlessingRegistry registry, BlessingManager blessings,
                          ChargeManager charge, PartyManager parties, Menus menus, CloverItems items, BlessingEngine engine,
-                         StatsService stats) {
+                         StatsService stats, SmpService smp) {
         this.plugin = plugin;
         this.data = data;
         this.registry = registry;
@@ -56,6 +58,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         this.items = items;
         this.engine = engine;
         this.stats = stats;
+        this.smp = smp;
     }
 
     @Override
@@ -70,6 +73,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
             case "inspect" -> inspect(sender, args);
             case "party" -> party(sender, args);
             case "admin" -> admin(sender, args);
+            case "smp" -> smp(sender, args);
             default -> help(sender);
         }
         return true;
@@ -80,6 +84,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         msg(s, "/clover inspect <player> — see someone's leaves", NamedTextColor.GRAY);
         msg(s, "/clover party invite|accept|leave|kick|list", NamedTextColor.GRAY);
         if (s.hasPermission("clover.admin")) {
+            msg(s, "/clover smp start|setting|status|reset", NamedTextColor.GRAY);
             msg(s, "/clover admin menu|debug|stats|resetcooldowns|give|seed|scrap|setcharge|reset|reload ...", NamedTextColor.GRAY);
         }
     }
@@ -193,6 +198,33 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         for (UUID id : party.getMembers()) {
             Player m = Bukkit.getPlayer(id);
             if (m != null) msg(m, text, NamedTextColor.GREEN);
+        }
+    }
+
+    // --- smp (season start) ---
+
+    private void smp(CommandSender s, String[] args) {
+        if (!s.hasPermission("clover.admin")) {
+            msg(s, "No permission.", NamedTextColor.RED);
+            return;
+        }
+        switch (args.length < 2 ? "" : args[1].toLowerCase(Locale.ROOT)) {
+            case "start" -> {
+                if (smp.begin()) plugin.getLogger().info(s.getName() + " started the SMP");
+                else msg(s, "The SMP already started (" + smp.state().phase() + "). /cl smp reset returns to the lobby.", NamedTextColor.RED);
+            }
+            case "setting", "settings" -> {
+                if (s instanceof Player p) smp.openSettings(p);
+                else msg(s, "Open it in game.", NamedTextColor.RED);
+            }
+            case "status" -> msg(s, smp.status(), NamedTextColor.AQUA);
+            case "reset" -> {
+                smp.reset();
+                plugin.getLogger().info(s.getName() + " reset the SMP to the lobby");
+                msg(s, "Back to the lobby: border shrunk around spawn; building, PvP, charge and blessings are locked.",
+                        NamedTextColor.YELLOW);
+            }
+            default -> msg(s, "Usage: /clover smp <start|setting|status|reset>", NamedTextColor.RED);
         }
     }
 
@@ -341,10 +373,11 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
                                       @NotNull String label, @NotNull String[] args) {
         List<String> options = switch (args.length) {
-            case 1 -> sender.hasPermission("clover.admin") ? List.of("inspect", "party", "admin") : List.of("inspect", "party");
+            case 1 -> sender.hasPermission("clover.admin") ? List.of("inspect", "party", "admin", "smp") : List.of("inspect", "party");
             case 2 -> switch (args[0].toLowerCase(Locale.ROOT)) {
                 case "inspect" -> onlineNames();
                 case "party" -> List.of("invite", "accept", "leave", "kick", "list");
+                case "smp" -> sender.hasPermission("clover.admin") ? List.of("start", "setting", "status", "reset") : List.of();
                 case "admin" -> sender.hasPermission("clover.admin")
                         ? List.of("menu", "debug", "stats", "resetcooldowns", "give", "seed", "scrap", "setcharge", "reset", "reload") : List.of();
                 default -> List.of();

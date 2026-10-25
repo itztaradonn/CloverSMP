@@ -148,3 +148,15 @@ storage:
 stats:
   # How often online 4-leaf players' loadouts are sampled for pick rate
   snapshot-minutes: 10
+
+# --- SMP season start (/clover smp start, /clover smp setting) ---
+smp:
+  countdown-seconds: 5
+  # PvP is off for this long after the start
+  grace-minutes: 20
+  # World border width around spawn in the lobby, and after the start
+  lobby-border: 50
+  final-border: 5000
+  expand-seconds: 30
+  float: true
+  clover-effect: true

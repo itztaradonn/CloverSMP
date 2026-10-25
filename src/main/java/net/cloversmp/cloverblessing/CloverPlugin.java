@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing;
 
+import net.cloversmp.cloverblessing.smp.SmpService;
 import net.cloversmp.cloverblessing.stats.StatsService;
 import net.cloversmp.cloverblessing.blessing.*;
 import net.cloversmp.cloverblessing.charge.ChargeManager;
@@ -39,6 +40,7 @@ public final class CloverPlugin extends JavaPlugin {
     private RecipeRegistry recipes;
     private NamespacedKey seedRecipeKey;
     private StatsService stats;
+    private SmpService smp;
 
     @Override
     public void onEnable() {
@@ -89,6 +91,10 @@ public final class CloverPlugin extends JavaPlugin {
             if (handler instanceof Listener listener) pm.registerEvents(listener, this);
         }
 
+        smp = new SmpService(this);
+        pm.registerEvents(smp, this);
+        smp.start();
+
         stats = new StatsService(this, dataManager, chargeManager);
         pm.registerEvents(stats, this);
         stats.start();
@@ -97,7 +103,7 @@ public final class CloverPlugin extends JavaPlugin {
         if (cmd == null) {
             throw new IllegalStateException("clover command is missing from plugin.yml");
         }
-        var handler = new CloverCommand(this, dataManager, registry, blessingManager, chargeManager, parties, menus, items, blessingEngine, stats);
+        var handler = new CloverCommand(this, dataManager, registry, blessingManager, chargeManager, parties, menus, items, blessingEngine, stats, smp);
         cmd.setExecutor(handler);
         cmd.setTabCompleter(handler);
 
@@ -164,6 +170,11 @@ public final class CloverPlugin extends JavaPlugin {
         getServer().removeRecipe(key);
         getServer().addRecipe(recipe);
         return key;
+    }
+
+    /** Charge, blessings and building only work once the SMP has started (see SmpService). */
+    public boolean progressionAllowed() {
+        return smp == null || smp.state().progressionAllowed();
     }
 
     public static CloverPlugin getInstance() {

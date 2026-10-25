@@ -85,3 +85,10 @@ Sounds are placeholders until your ElevenLabs files are in `art/sfx/` (see `docs
 - [ ] A boss bar lists blessings that are cooling down or waking ("Thornlash 12s · Stinger 3s (waking)"), yellow while waking, green otherwise; it hides when all are ready
 - [ ] 30 s after equipping, chat says "✿ <blessing> has awakened." with a ding
 - [ ] `/cl admin resetcooldowns <player> skills|wakes|all` clears just that kind
+
+## SMP start
+- [ ] Fresh install is in the lobby: no building (ops bypass), no PvP, no charge, no blessings. `/cl smp reset` shrinks the border to 50 around spawn
+- [ ] `/cl smp start`: everyone floats, a green clover spins around each player, titles count 5 to 0 with rising notes
+- [ ] At 0: burst + sounds, slow falling, border grows to 5000 over 30 s, grace boss bar counts down 20 min, PvP blocked (melee and arrows)
+- [ ] When grace ends: "PvP is now enabled" + growl; boss bar gone. A restart mid-grace keeps the remaining time
+- [ ] `/cl smp setting` menu: left/right click +/- (shift ×10), toggles for float and clover effect, saved to config

@@ -170,6 +170,7 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
     // =====================================================================
 
     private void dispatch(Player player, String event, Hook hook) {
+        if (!plugin.progressionAllowed()) return;
         Map<LeafSlot, String> trace = debug.contains(player.getUniqueId()) ? new EnumMap<>(LeafSlot.class) : null;
         forEachActive(player, ctx -> {
             String result;
@@ -460,7 +461,7 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
         flashUntil.values().removeIf(until -> until < now);
         for (Player player : Bukkit.getOnlinePlayers()) {
             StatSink stats = new StatSink();
-            forEachActive(player, ctx -> {
+            if (plugin.progressionAllowed()) forEachActive(player, ctx -> {
                 BlessingHandler h = registry.getHandler(ctx.core().getId());
                 if (h != null && h.onSecond(ctx, stats)) {
                     flashUntil.put(ctx.instanceId(), now + FLASH_MS);

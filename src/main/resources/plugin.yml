@@ -29,6 +29,9 @@ permissions:
   clover.admin.setcharge:
     description: Set a player's charge
     default: op
+  clover.smp.bypass:
+    description: Build and break blocks before the SMP starts
+    default: op
   clover.admin.reset:
     description: Reset a player's clover
     default: op
