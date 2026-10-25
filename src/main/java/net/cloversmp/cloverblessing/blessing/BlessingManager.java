@@ -70,6 +70,8 @@ public class BlessingManager {
             Effects.sound(player.getLocation(), "clover.pact_take", 1f, 1f);
             Effects.particles(Effects.body(player, 0.6), org.bukkit.Particle.SOUL, 20, 0.6);
             Effects.particles(Effects.body(player, 0.3), org.bukkit.Particle.SQUID_INK, 10, 0.4);
+            Effects.dust(Effects.body(player, 0.5), org.bukkit.Color.fromRGB(0x5A, 0x0F, 0x14), 25, 0.5);
+            Effects.particles(Effects.body(player, 1.0), org.bukkit.Particle.SOUL_FIRE_FLAME, 8, 0.2);
         }
         long lockMs = plugin.getConfig().getLong("loadout.swap-lock-seconds", 30) * 1000L;
         if (cooldownManager.getRemainingMs(clover, blessingId) < lockMs) {
@@ -117,6 +119,8 @@ public class BlessingManager {
                 NamedTextColor.DARK_PURPLE));
         Effects.sound(player.getLocation(), "clover.pact_break", 1f, 1f);
         Effects.particles(Effects.body(player, 0.6), org.bukkit.Particle.LARGE_SMOKE, 15, 0.4);
+        Effects.dust(Effects.body(player, 0.5), org.bukkit.Color.fromRGB(0x10, 0x10, 0x10), 20, 0.5);
+        Effects.particles(Effects.body(player, 0.6), org.bukkit.Particle.CRIT, 12, 0.5);
     }
 
     private boolean hasEchoElsewhere(Clover clover, LeafSlot target) {

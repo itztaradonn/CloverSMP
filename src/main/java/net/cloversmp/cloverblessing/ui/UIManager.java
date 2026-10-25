@@ -12,14 +12,18 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Always-on feedback (concept doc, "Feedback and UI"): one action bar line showing each leaf's state,
- * and a ring of leaf particles that shows opponents your leaf count, plus a dark mote for a curse.
+ * and a clover of leaf particles that shows opponents your leaf count, plus a dark aura for an active curse.
  */
 public class UIManager {
 
@@ -45,7 +49,7 @@ public class UIManager {
 
     public void startTasks() {
         long bar = plugin.getConfig().getLong("ui.actionbar-refresh-ticks", 10);
-        long ring = plugin.getConfig().getLong("ui.particle-refresh-ticks", 20);
+        long ring = plugin.getConfig().getLong("ui.particle-refresh-ticks", 10);
         actionBarTask = Bukkit.getScheduler().runTaskTimer(plugin, this::tickActionBar, 20L, bar);
         particleTask = Bukkit.getScheduler().runTaskTimer(plugin, this::tickParticles, 20L, ring);
     }
@@ -71,20 +75,70 @@ public class UIManager {
         return bar.build();
     }
 
+    private static final Color LEAF = Color.fromRGB(0x5F, 0xA8, 0x29);
+    private static final Color LEAF_DARK = Color.fromRGB(0x3B, 0x6D, 0x11);
+    private static final Color WILTED = Color.fromRGB(0x6B, 0x5B, 0x4B);
+    private static final Color BLOOD = Color.fromRGB(0x5A, 0x0F, 0x14);
+    private static final Color BLACK = Color.fromRGB(0x10, 0x10, 0x10);
+    /** Cross offsets (x, z in the rotating frame) for leaf 1 left, 2 top, 3 right, 4 bottom. */
+    private static final double[][] CROSS = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
+
+    /**
+     * Clover ring at the feet (one 3-dot cluster per open leaf, one grey-brown dot for a wilted one) plus, when
+     * cursed, a rising dark swirl and the curse's own occasional tell. About 12 + 8 particles per player per run.
+     */
     private void tickParticles() {
+        double t = (System.currentTimeMillis() % 20_000) / 20_000.0 * 2 * Math.PI;
         for (Player player : Bukkit.getOnlinePlayers()) {
             Clover clover = data.getClover(player.getUniqueId());
             if (clover == null || player.isInvisible()) continue;
-            int leaves = charge.getLeafCount(clover);
+            Blessing curse = clover.getEquippedBlessing(LeafSlot.CURSE);
+            boolean cursed = curse != null && charge.isLeafActive(clover, LeafSlot.CURSE);
             Location base = player.getLocation().add(0, 0.1, 0);
-            for (int i = 0; i < leaves; i++) {
-                double angle = (2 * Math.PI / leaves) * i + (System.currentTimeMillis() % 4000) / 4000.0 * 2 * Math.PI;
-                player.getWorld().spawnParticle(Particle.COMPOSTER,
-                        base.clone().add(1.2 * Math.cos(angle), 0, 1.2 * Math.sin(angle)), 1, 0, 0.05, 0, 0);
+            double cos = Math.cos(t), sin = Math.sin(t);
+            for (LeafSlot slot : LeafSlot.values()) {
+                if (slot.isCurse()) continue;
+                boolean open = charge.isLeafActive(clover, slot);
+                if (!open && clover.getEquippedBlessing(slot) == null) continue;
+                double[] c = CROSS[slot.getIndex()];
+                Location at = base.clone().add(1.1 * (c[0] * cos - c[1] * sin), 0, 1.1 * (c[0] * sin + c[1] * cos));
+                if (!open) {
+                    Effects.dust(at, WILTED, 1, 0.1);
+                } else if (cursed) {
+                    Effects.dust(at, LEAF_DARK, 2, 0.12);
+                    Effects.dust(at, BLOOD, 1, 0.15);
+                } else {
+                    Effects.dust(at, LEAF, 2, 0.12);
+                    Effects.dust(at, LEAF_DARK, 1, 0.12);
+                }
             }
-            if (clover.getEquippedBlessing(LeafSlot.CURSE) != null && charge.isLeafActive(clover, LeafSlot.CURSE)) {
-                player.getWorld().spawnParticle(Particle.SQUID_INK, base.clone().add(0, 0.2, 0), 2, 0.3, 0.05, 0.3, 0);
+            if (cursed) curseAura(player, curse.getCoreId(), base, t);
+        }
+    }
+
+    /** Blood-red and black dust spiralling up the body, a rare wisp, and a cheap per-curse tell. */
+    private void curseAura(Player player, String curseId, Location base, double t) {
+        double h = player.getHeight();
+        for (int i = 0; i < 6; i++) {
+            double a = t * 8 + i * Math.PI / 3;
+            double y = ((t * 4 / Math.PI + i / 6.0) % 1.0) * h;
+            Effects.dust(base.clone().add(0.55 * Math.cos(a), y, 0.55 * Math.sin(a)), i % 2 == 0 ? BLOOD : BLACK, 1, 0.02);
+        }
+        ThreadLocalRandom r = ThreadLocalRandom.current();
+        if (r.nextInt(8) == 0) Effects.particles(Effects.body(player, 0.5), r.nextBoolean() ? Particle.SOUL : Particle.SMOKE, 1, 0.3);
+        if (r.nextInt(8) != 0) return;
+        switch (curseId) {
+            case "hungering_clover" -> Effects.particles(Effects.body(player, 0.5), Particle.ITEM_SLIME, 2, 0.3);
+            case "thorncrown" -> Effects.particles(Effects.body(player, 1.0), Particle.CRIT, 2, 0.2);
+            case "bloodroot" -> player.getWorld().spawnParticle(Particle.FALLING_DUST, Effects.body(player, 0.9), 1, 0.2, 0, 0.2, 0,
+                    Material.NETHER_WART_BLOCK.createBlockData());
+            case "hollow_bell" -> {
+                for (int i = 0; i < 8; i++) {
+                    double a = i * Math.PI / 4;
+                    Effects.dust(base.clone().add(1.6 * Math.cos(a), 0, 1.6 * Math.sin(a)), BLACK, 1, 0.02);
+                }
             }
+            default -> { }
         }
     }
 }

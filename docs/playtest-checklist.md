@@ -73,4 +73,5 @@ Sounds are placeholders until your ElevenLabs files are in `art/sfx/` (see `docs
 - [ ] Opening a leaf: leaf burst + chime. Dying and losing a leaf: brown dust + crunch
 - [ ] Taking a curse: soul burst; breaking one: smoke + shatter. Hollow Bell tolls every 30 s
 - [ ] Press / graft / prune each have a sound; a kill plays the charge blip
+- [ ] Clover ring at your feet: one green 3-dot cluster per open leaf (left/top/right/bottom), a grey-brown dot for a wilted leaf; with an active curse the clusters turn dark with red edges and a blood-red/black swirl rises round the body, with a rare soul/smoke wisp and a per-curse tell (slime, crit, drip, bell ring)
 - [ ] A quiet private ding when a blessing comes off cooldown

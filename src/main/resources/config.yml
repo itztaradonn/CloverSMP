@@ -135,7 +135,7 @@ ui:
   # Action bar refresh interval (ticks)
   actionbar-refresh-ticks: 10
   # Leaf particle ring refresh interval (ticks)
-  particle-refresh-ticks: 20
+  particle-refresh-ticks: 10
 
 # --- Persistence ---
 storage:
