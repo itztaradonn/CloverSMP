@@ -1,12 +1,7 @@
 {
   "blessing.thornlash": {
     "sounds": [
-      {
-        "name": "minecraft:entity.player.attack.crit",
-        "type": "event",
-        "pitch": 1.4,
-        "volume": 1.0
-      }
+      "cloverblessing:blessing/thornlash"
     ]
   },
   "blessing.stinger": {
