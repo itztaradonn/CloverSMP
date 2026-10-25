@@ -147,6 +147,21 @@ public class Menus implements Listener {
         player.openInventory(inv);
     }
 
+    /** Admin: every blessing and curse; clicking one gives the admin a fresh, ungrafted copy. */
+    public void openAdminAll(Player player) {
+        Clover clover = data.getClover(player.getUniqueId());
+        if (clover == null) return;
+        Inventory inv = create(new MenuHolder(MenuHolder.Kind.ADMIN_ALL, null), 54, "☘ All blessings (admin)");
+        List<BlessingCore> all = List.copyOf(registry.getAllCores());
+        for (int i = 0; i < all.size() && i < HERBARIUM_PAGE; i++) {
+            Blessing preview = new Blessing(UUID.randomUUID(), all.get(i).getId(), null, player.getUniqueId());
+            inv.setItem(i, blessingItem(clover, preview, List.of(line("Click to give yourself one", NamedTextColor.YELLOW),
+                    line("id: " + all.get(i).getId(), NamedTextColor.DARK_GRAY))));
+        }
+        inv.setItem(BACK_SLOT, item(Material.ARROW, text("Back to your clover", NamedTextColor.YELLOW)));
+        player.openInventory(inv);
+    }
+
     /** Every recipe: discovered ones in full, the rest as silhouettes with category and ingredient hints. */
     public void openFieldGuide(Player player) {
         Clover clover = data.getClover(player.getUniqueId());
@@ -249,6 +264,18 @@ public class Menus implements Listener {
                     reopen(player, () -> openClover(player));
                 } else {
                     reopen(player, () -> openLeafPicker(player, b));
+                }
+            }
+            case ADMIN_ALL -> {
+                if (raw == BACK_SLOT) {
+                    reopen(player, () -> openClover(player));
+                    return;
+                }
+                List<BlessingCore> all = List.copyOf(registry.getAllCores());
+                if (!player.hasPermission("clover.admin") || raw >= all.size()) return;
+                BlessingCore core = all.get(raw);
+                if (blessings.give(clover, core.getId(), null) != null) {
+                    player.sendMessage(Component.text("Added " + core.getDisplayName() + " to your herbarium.", NamedTextColor.GREEN));
                 }
             }
             case FIELD_GUIDE -> {

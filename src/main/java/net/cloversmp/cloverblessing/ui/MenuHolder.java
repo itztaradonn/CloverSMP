@@ -13,7 +13,7 @@ import java.util.UUID;
  */
 public final class MenuHolder implements InventoryHolder {
 
-    public enum Kind { CLOVER, HERBARIUM, LEAF_PICKER, FIELD_GUIDE, PRESS, GRAFT_LIST, GRAFT_ONE;
+    public enum Kind { CLOVER, HERBARIUM, LEAF_PICKER, FIELD_GUIDE, ADMIN_ALL, PRESS, GRAFT_LIST, GRAFT_ONE;
 
         /** Kinds handled by the Pressing Table menu, which lets players place items in its input slots. */
         public boolean isTable() {

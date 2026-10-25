@@ -1,6 +1,7 @@
 package net.cloversmp.cloverblessing.command;
 
 import net.cloversmp.cloverblessing.CloverPlugin;
+import net.cloversmp.cloverblessing.blessing.BlessingEngine;
 import net.cloversmp.cloverblessing.blessing.BlessingManager;
 import net.cloversmp.cloverblessing.blessing.BlessingRegistry;
 import net.cloversmp.cloverblessing.charge.ChargeManager;
@@ -38,9 +39,10 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
     private final PartyManager parties;
     private final Menus menus;
     private final CloverItems items;
+    private final BlessingEngine engine;
 
     public CloverCommand(CloverPlugin plugin, DataManager data, BlessingRegistry registry, BlessingManager blessings,
-                         ChargeManager charge, PartyManager parties, Menus menus, CloverItems items) {
+                         ChargeManager charge, PartyManager parties, Menus menus, CloverItems items, BlessingEngine engine) {
         this.plugin = plugin;
         this.data = data;
         this.registry = registry;
@@ -49,6 +51,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         this.parties = parties;
         this.menus = menus;
         this.items = items;
+        this.engine = engine;
     }
 
     @Override
@@ -73,7 +76,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         msg(s, "/clover inspect <player> — see someone's leaves", NamedTextColor.GRAY);
         msg(s, "/clover party invite|accept|leave|kick|list", NamedTextColor.GRAY);
         if (s.hasPermission("clover.admin")) {
-            msg(s, "/clover admin give|seed|scrap|setcharge|reset|reload ...", NamedTextColor.GRAY);
+            msg(s, "/clover admin menu|debug|give|seed|scrap|setcharge|reset|reload ...", NamedTextColor.GRAY);
         }
     }
 
@@ -197,6 +200,20 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
             return;
         }
         String action = args.length < 2 ? "" : args[1].toLowerCase(Locale.ROOT);
+        if (action.equals("menu") || action.equals("debug")) {
+            if (!(s instanceof Player p)) {
+                msg(s, "Only players can use this.", NamedTextColor.RED);
+                return;
+            }
+            if (action.equals("menu")) {
+                menus.openAdminAll(p);
+            } else {
+                boolean on = engine.toggleDebug(p.getUniqueId());
+                msg(p, on ? "Debug on: every blessing check you trigger is logged to the server console." : "Debug off.",
+                        on ? NamedTextColor.GREEN : NamedTextColor.YELLOW);
+            }
+            return;
+        }
         if (action.equals("reload")) {
             if (!require(s, "clover.admin.reload")) return;
             plugin.reloadAll();
@@ -272,7 +289,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
                 plugin.getLogger().info(s.getName() + " reset the clover of " + target.getName());
                 msg(s, "Reset " + target.getName() + "'s clover.", NamedTextColor.YELLOW);
             }
-            default -> msg(s, "Usage: /clover admin <give|seed|scrap|setcharge|reset|reload>", NamedTextColor.RED);
+            default -> msg(s, "Usage: /clover admin <menu|debug|give|seed|scrap|setcharge|reset|reload>", NamedTextColor.RED);
         }
     }
 
@@ -297,7 +314,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
                 case "inspect" -> onlineNames();
                 case "party" -> List.of("invite", "accept", "leave", "kick", "list");
                 case "admin" -> sender.hasPermission("clover.admin")
-                        ? List.of("give", "seed", "scrap", "setcharge", "reset", "reload") : List.of();
+                        ? List.of("menu", "debug", "give", "seed", "scrap", "setcharge", "reset", "reload") : List.of();
                 default -> List.of();
             };
             case 3 -> args[0].equalsIgnoreCase("admin") || args[1].equalsIgnoreCase("invite")

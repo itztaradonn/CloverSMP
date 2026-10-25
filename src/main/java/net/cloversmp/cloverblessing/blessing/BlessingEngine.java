@@ -166,12 +166,51 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
     // Dispatch and firing
     // =====================================================================
 
-    private void dispatch(Player player, Hook hook) {
+    private void dispatch(Player player, String event, Hook hook) {
+        Map<LeafSlot, String> trace = debug.contains(player.getUniqueId()) ? new EnumMap<>(LeafSlot.class) : null;
         forEachActive(player, ctx -> {
-            if (cooldownManager.isOnCooldown(ctx.clover(), ctx.instanceId())) return;
+            String result;
+            long cooldown = cooldownManager.getRemainingMs(ctx.clover(), ctx.instanceId());
             BlessingHandler h = registry.getHandler(ctx.core().getId());
-            if (h != null && hook.call(h, ctx)) fire(ctx);
+            if (cooldown > 0) result = "cooldown " + (cooldown / 1000 + 1) + "s";
+            else if (h == null) result = "no handler";
+            else if (hook.call(h, ctx)) {
+                fire(ctx);
+                result = "FIRED";
+            } else result = "no trigger";
+            if (trace != null) trace.put(ctx.slot(), ctx.core().getId() + (ctx.echo() ? " (echo)" : "") + "=" + result);
         });
+        if (trace != null) logTrace(player, event, trace);
+    }
+
+    // =====================================================================
+    // Debug mode (/clover admin debug): one console line per event per player
+    // =====================================================================
+
+    private final Set<UUID> debug = ConcurrentHashMap.newKeySet();
+
+    /** @return true if debug is now on for this player */
+    public boolean toggleDebug(UUID player) {
+        if (debug.remove(player)) return false;
+        debug.add(player);
+        return true;
+    }
+
+    private void logTrace(Player player, String event, Map<LeafSlot, String> ran) {
+        Clover clover = dataManager.getClover(player.getUniqueId());
+        if (clover == null) return;
+        StringJoiner line = new StringJoiner(", ");
+        for (LeafSlot slot : LeafSlot.values()) {
+            String r = ran.get(slot);
+            if (r == null) {
+                Blessing b = clover.getEquippedBlessing(slot);
+                if (b == null) r = "empty";
+                else if (!chargeManager.isLeafActive(clover, slot)) r = b.getCoreId() + "=wilted";
+                else r = b.getCoreId() + "=nothing to copy";
+            }
+            line.add((slot.isCurse() ? "L5 " : "L" + (slot.getIndex() + 1) + " ") + r);
+        }
+        plugin.getLogger().info("[debug] " + player.getName() + " " + event + ": " + line);
     }
 
     /** Starts the cooldown and plays the trigger flash and sound. */
@@ -287,17 +326,17 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
             if (damager instanceof Player attacker && attacker != target
                     && (cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK
                     || cause == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK)) {
-                dispatch(attacker, (h, c) -> h.onMeleeHit(c, byEntity, target));
+                dispatch(attacker, "onMeleeHit -> " + target.getName(), (h, c) -> h.onMeleeHit(c, byEntity, target));
             } else if (damager instanceof AbstractArrow arrow && arrow.getShooter() instanceof Player shooter
                     && shooter != target) {
-                dispatch(shooter, (h, c) -> h.onArrowHit(c, byEntity, target));
+                dispatch(shooter, "onArrowHit -> " + target.getName(), (h, c) -> h.onArrowHit(c, byEntity, target));
             }
         }
 
         if (!(event.getEntity() instanceof Player victim) || event.isCancelled()) return;
 
         double before = event.getDamage();
-        dispatch(victim, (h, c) -> h.onDamaged(c, event));
+        dispatch(victim, "onDamaged", (h, c) -> h.onDamaged(c, event));
         double maxReduction = plugin.getConfig().getDouble("balance.max-single-source-reduction-percent", 50) / 100.0;
         event.setDamage(BalanceRules.clampReduction(before, event.getDamage(), maxReduction));
 
@@ -307,7 +346,7 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
                 || cause == EntityDamageEvent.DamageCause.SUICIDE;
         if (!event.isCancelled() && !unstoppable
                 && event.getFinalDamage() >= victim.getHealth() + victim.getAbsorptionAmount()) {
-            dispatch(victim, (h, c) -> !event.isCancelled() && h.onFatalDamage(c, event));
+            dispatch(victim, "onFatalDamage", (h, c) -> !event.isCancelled() && h.onFatalDamage(c, event));
         }
     }
 
@@ -331,34 +370,34 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
     @EventHandler(ignoreCancelled = true)
     public void onProjectileHit(ProjectileHitEvent event) {
         if (event.getEntity() instanceof AbstractArrow arrow && arrow.getShooter() instanceof Player shooter) {
-            dispatch(shooter, (h, c) -> h.onProjectileLand(c, event));
+            dispatch(shooter, "onProjectileLand", (h, c) -> h.onProjectileLand(c, event));
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onSneak(PlayerToggleSneakEvent event) {
-        dispatch(event.getPlayer(), (h, c) -> h.onSneak(c, event.isSneaking()));
+        dispatch(event.getPlayer(), "onSneak", (h, c) -> h.onSneak(c, event.isSneaking()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onSwapHand(PlayerSwapHandItemsEvent event) {
-        dispatch(event.getPlayer(), (h, c) -> h.onSwapHand(c, event));
+        dispatch(event.getPlayer(), "onSwapHand", (h, c) -> h.onSwapHand(c, event));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) return;
-        dispatch(event.getPlayer(), (h, c) -> h.onInteractBlock(c, event));
+        dispatch(event.getPlayer(), "onInteractBlock", (h, c) -> h.onInteractBlock(c, event));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onRegainHealth(EntityRegainHealthEvent event) {
-        if (event.getEntity() instanceof Player p) dispatch(p, (h, c) -> h.onRegainHealth(c, event));
+        if (event.getEntity() instanceof Player p) dispatch(p, "onRegainHealth", (h, c) -> h.onRegainHealth(c, event));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onFoodChange(FoodLevelChangeEvent event) {
-        if (event.getEntity() instanceof Player p) dispatch(p, (h, c) -> h.onFoodChange(c, event));
+        if (event.getEntity() instanceof Player p) dispatch(p, "onFoodChange", (h, c) -> h.onFoodChange(c, event));
     }
 
     @EventHandler

@@ -3,7 +3,8 @@
 Server: Paper 1.21.11, Java 21. Drop `build/libs/CloverBlessing-1.0.0-SNAPSHOT.jar` into `plugins/`.
 For testing with fresh accounts, set `anti-abuse.min-victim-playtime-hours: 0` (otherwise new victims give no PvP charge).
 
-Setup: `/clover admin setcharge <you> 1000`, then `/clover admin give <you> <core> [graft]` and equip from `/clover`.
+Setup: `/clover admin setcharge <you> 1000`, then `/clover admin menu` (click any blessing to get it) and equip from `/clover`.
+Debug: `/clover admin debug` logs every blessing check you trigger to the server console (`logs/latest.log`).
 
 ## Core
 - [ ✅ ] Plugin enables; log says "20 blessings and curses"; no errors on join, quit, `/clover admin reload`, server stop

@@ -91,7 +91,7 @@ public final class CloverPlugin extends JavaPlugin {
         if (cmd == null) {
             throw new IllegalStateException("clover command is missing from plugin.yml");
         }
-        var handler = new CloverCommand(this, dataManager, registry, blessingManager, chargeManager, parties, menus, items);
+        var handler = new CloverCommand(this, dataManager, registry, blessingManager, chargeManager, parties, menus, items, blessingEngine);
         cmd.setExecutor(handler);
         cmd.setTabCompleter(handler);
 
