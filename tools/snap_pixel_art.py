@@ -1,10 +1,12 @@
 """Snap upscaled (often AI-generated, slightly blurry) pixel art back to its real pixel grid.
 
-Usage: python -I tools/snap_pixel_art.py <input.png> <grid> <output.png> [max_colors]
+Usage: python -I tools/snap_pixel_art.py <input.png> <grid> <output.png> [max_colors] [x0 y0 x1 y1]
 
 <grid> is how many art pixels span the full image width (e.g. 32 for a 1024px image of 32px cells).
 Near-white background becomes transparent, the art is cropped to its content and padded to a square,
 and colours are reduced to <max_colors> (default 8) so blur between cells disappears.
+An optional crop box (in grid cells, end exclusive) replaces the content crop, so a set of images drawn on the
+same grid (e.g. a clover growing from 1 to 4 leaves) keeps the same size and alignment.
 """
 import sys
 
@@ -28,7 +30,8 @@ for gy in range(grid):
 
 img = Image.fromarray(cells, "RGBA")
 alpha = img.getchannel("A")
-img = img.crop(alpha.getbbox())
+box = tuple(int(v) for v in sys.argv[5:9]) if len(sys.argv) > 8 else alpha.getbbox()
+img = img.crop(box)
 side = max(img.size)
 square = Image.new("RGBA", (side, side))
 square.paste(img, ((side - img.width) // 2, (side - img.height) // 2))

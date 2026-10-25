@@ -20,6 +20,33 @@
     },
     {
       "type": "bitmap",
+      "file": "cloverblessing:font/clover_1.png",
+      "ascent": 11,
+      "height": 14,
+      "chars": [
+        "\ue004"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cloverblessing:font/clover_2.png",
+      "ascent": 11,
+      "height": 14,
+      "chars": [
+        "\ue005"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cloverblessing:font/clover_3.png",
+      "ascent": 11,
+      "height": 14,
+      "chars": [
+        "\ue006"
+      ]
+    },
+    {
+      "type": "bitmap",
       "file": "cloverblessing:font/clover.png",
       "ascent": 8,
       "height": 9,
@@ -34,6 +61,33 @@
       "height": 9,
       "chars": [
         "\ue003"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cloverblessing:font/clover_1.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue007"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cloverblessing:font/clover_2.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue008"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cloverblessing:font/clover_3.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue009"
       ]
     }
   ]

@@ -10,6 +10,7 @@ import net.cloversmp.cloverblessing.storage.DataManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -64,26 +65,22 @@ public class UIManager {
     /** e.g. "🍀⚔ 🍀🛡 🍀💨 3s 🍂 ☠ ⚡650/1000" */
     Component actionBar(Clover clover) {
         boolean cursed = clover.getEquippedBlessing(LeafSlot.CURSE) != null && charge.isLeafActive(clover, LeafSlot.CURSE);
-        TextComponent.Builder bar = Component.text().append(Menus.cloverIcon(cursed, true), Component.space());
+        TextComponent.Builder bar = Component.text()
+                .append(Menus.cloverIcon(charge.getLeafCount(clover), cursed, true), Component.space());
+        // One square per open leaf: category colour when ready, grey while cooling down, gold as it fires, hollow if empty.
         for (LeafSlot slot : LeafSlot.values()) {
+            if (slot.isCurse() || !charge.isLeafActive(clover, slot)) continue;
             Blessing b = clover.getEquippedBlessing(slot);
-            boolean open = charge.isLeafActive(clover, slot);
-            if (slot.isCurse() && b == null) continue;
-            if (!open) {
-                bar.append(Component.text(slot.isCurse() ? "☠" : "🍂", NamedTextColor.DARK_GRAY));
-            } else if (b == null) {
-                bar.append(Component.text("🍀", NamedTextColor.GREEN));
-            } else {
-                BlessingCore core = registry.getCore(b.getCoreId());
-                long remaining = cooldowns.getRemainingMs(clover, b.getId());
-                NamedTextColor color = engine.isFlashing(b.getId()) ? NamedTextColor.GOLD
-                        : remaining > 0 ? NamedTextColor.GRAY : slot.isCurse() ? NamedTextColor.DARK_PURPLE : NamedTextColor.GREEN;
-                bar.append(Component.text(slot.isCurse() ? "☠" : "🍀", color));
-                if (core != null && !slot.isCurse()) bar.append(Component.text(core.getCategory().getIcon(), color));
-                if (remaining > 0) bar.append(Component.text((remaining / 1000 + 1) + "s", NamedTextColor.GRAY));
+            BlessingCore core = b == null ? null : registry.getCore(b.getCoreId());
+            if (core == null) {
+                bar.append(Component.text("□", NamedTextColor.DARK_GRAY));
+                continue;
             }
-            bar.append(Component.space());
+            TextColor color = engine.isFlashing(b.getId()) ? NamedTextColor.GOLD
+                    : cooldowns.getRemainingMs(clover, b.getId()) > 0 ? NamedTextColor.GRAY : Menus.categoryColor(core.getCategory());
+            bar.append(Component.text("■", color));
         }
+        bar.append(Component.space());
         bar.append(Component.text("⚡" + clover.getCharge() + "/" + charge.getMaxCharge(), NamedTextColor.YELLOW));
         return bar.build();
     }

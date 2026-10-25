@@ -60,5 +60,7 @@ Setup: `/clover admin seed <you> 16`, `/clover admin scrap <you> echo_leaf`, `/c
 
 ## Clover icon (resource pack)
 - [ ] On join the server offers the pack; after accepting, the action bar starts with the green clover
+- [ ] The clover shows 1, 2, 3 or 4 leaves to match your open leaves (`/clover admin setcharge` 0 / 100 / 350 / 800)
+- [ ] One square per open leaf: category colour when ready, grey on cooldown, gold when it fires, hollow if empty
 - [ ] With a curse equipped (leaf 5 open) it switches to the red/black clover
 - [ ] The /clover menu title shows the small clover icon

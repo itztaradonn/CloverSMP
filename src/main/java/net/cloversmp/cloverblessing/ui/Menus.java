@@ -72,7 +72,7 @@ public class Menus implements Listener {
         if (clover == null) return;
         MenuHolder holder = new MenuHolder(MenuHolder.Kind.CLOVER, null);
         boolean cursed = clover.getEquippedBlessing(LeafSlot.CURSE) != null && charge.isLeafActive(clover, LeafSlot.CURSE);
-        Inventory inv = create(holder, 54, cloverIcon(cursed, false)
+        Inventory inv = create(holder, 54, cloverIcon(charge.getLeafCount(clover), cursed, false)
                 .append(text(" Your Clover", cursed ? NamedTextColor.DARK_RED : NamedTextColor.DARK_GREEN)));
 
         int leaves = charge.getLeafCount(clover);
@@ -329,11 +329,15 @@ public class Menus implements Listener {
     private static final Key ICON_FONT = Key.key("cloverblessing", "icons");
 
     /**
-     * The clover image from the server resource pack (green, or red/black while a curse is active).
-     * Without the pack it shows as a missing-glyph box. White and shadowless, since text colour tints font images.
+     * The clover image from the server resource pack: 1-4 leaves to match the open leaves, or the red/black
+     * clover while a curse is active. Without the pack it shows as a missing-glyph box. White and shadowless,
+     * since text colour tints font images. Glyphs are defined in resourcepack/assets/cloverblessing/font/icons.json.
      */
-    public static Component cloverIcon(boolean cursed, boolean large) {
-        char glyph = large ? (cursed ? '\uE001' : '\uE000') : (cursed ? '\uE003' : '\uE002');
+    public static Component cloverIcon(int leaves, boolean cursed, boolean large) {
+        char glyph;
+        if (cursed) glyph = large ? '\uE001' : '\uE003';
+        else if (leaves >= 4) glyph = large ? '\uE000' : '\uE002';
+        else glyph = (char) ((large ? '\uE004' : '\uE007') + Math.max(1, leaves) - 1);
         return Component.text(glyph).font(ICON_FONT).color(NamedTextColor.WHITE).shadowColor(ShadowColor.none())
                 .decoration(TextDecoration.BOLD, false).decoration(TextDecoration.ITALIC, false);
     }
