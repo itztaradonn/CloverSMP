@@ -67,20 +67,6 @@ public class UIManager {
         boolean cursed = clover.getEquippedBlessing(LeafSlot.CURSE) != null && charge.isLeafActive(clover, LeafSlot.CURSE);
         TextComponent.Builder bar = Component.text()
                 .append(Menus.cloverIcon(charge.getLeafCount(clover), cursed, true), Component.space());
-        // One square per open leaf: category colour when ready, grey while cooling down, gold as it fires, hollow if empty.
-        for (LeafSlot slot : LeafSlot.values()) {
-            if (slot.isCurse() || !charge.isLeafActive(clover, slot)) continue;
-            Blessing b = clover.getEquippedBlessing(slot);
-            BlessingCore core = b == null ? null : registry.getCore(b.getCoreId());
-            if (core == null) {
-                bar.append(Component.text("□", NamedTextColor.DARK_GRAY));
-                continue;
-            }
-            TextColor color = engine.isFlashing(b.getId()) ? NamedTextColor.GOLD
-                    : cooldowns.getRemainingMs(clover, b.getId()) > 0 ? NamedTextColor.GRAY : Menus.categoryColor(core.getCategory());
-            bar.append(Component.text("■", color));
-        }
-        bar.append(Component.space());
         bar.append(Component.text("⚡" + clover.getCharge() + "/" + charge.getMaxCharge(), NamedTextColor.YELLOW));
         return bar.build();
     }
