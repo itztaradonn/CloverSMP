@@ -1,3 +1,5 @@
+import java.security.MessageDigest
+
 plugins {
     java
 }
@@ -31,5 +33,21 @@ tasks {
     }
     test {
         useJUnitPlatform()
+    }
+
+    // ./gradlew resourcePack → build/distributions/CloverBlessing-pack.zip plus the SHA-1 for server.properties
+    register<Zip>("resourcePack") {
+        from("resourcepack")
+        archiveFileName.set("CloverBlessing-pack.zip")
+        destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+        isPreserveFileTimestamps = false // same art → same zip → same SHA-1
+        isReproducibleFileOrder = true
+        doLast {
+            val zip = archiveFile.get().asFile
+            val sha1 = MessageDigest.getInstance("SHA-1").digest(zip.readBytes())
+                .joinToString("") { "%02x".format(it) }
+            println("Resource pack: $zip")
+            println("resource-pack-sha1=$sha1")
+        }
     }
 }

@@ -9,7 +9,9 @@ import net.cloversmp.cloverblessing.crafting.ClaimService;
 import net.cloversmp.cloverblessing.crafting.RecipeRegistry;
 import net.cloversmp.cloverblessing.model.*;
 import net.cloversmp.cloverblessing.storage.DataManager;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.ShadowColor;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -69,7 +71,9 @@ public class Menus implements Listener {
         Clover clover = data.getClover(player.getUniqueId());
         if (clover == null) return;
         MenuHolder holder = new MenuHolder(MenuHolder.Kind.CLOVER, null);
-        Inventory inv = create(holder, 54, "☘ Your Clover");
+        boolean cursed = clover.getEquippedBlessing(LeafSlot.CURSE) != null && charge.isLeafActive(clover, LeafSlot.CURSE);
+        Inventory inv = create(holder, 54, cloverIcon(cursed, false)
+                .append(text(" Your Clover", cursed ? NamedTextColor.DARK_RED : NamedTextColor.DARK_GREEN)));
 
         int leaves = charge.getLeafCount(clover);
         inv.setItem(INFO_SLOT, item(Material.LILY_PAD, text("☘ " + player.getName() + "'s Clover", NamedTextColor.GREEN),
@@ -322,6 +326,18 @@ public class Menus implements Listener {
         };
     }
 
+    private static final Key ICON_FONT = Key.key("cloverblessing", "icons");
+
+    /**
+     * The clover image from the server resource pack (green, or red/black while a curse is active).
+     * Without the pack it shows as a missing-glyph box. White and shadowless, since text colour tints font images.
+     */
+    public static Component cloverIcon(boolean cursed, boolean large) {
+        char glyph = large ? (cursed ? '\uE001' : '\uE000') : (cursed ? '\uE003' : '\uE002');
+        return Component.text(glyph).font(ICON_FONT).color(NamedTextColor.WHITE).shadowColor(ShadowColor.none())
+                .decoration(TextDecoration.BOLD, false).decoration(TextDecoration.ITALIC, false);
+    }
+
     public static TextColor categoryColor(BlessingCategory c) {
         return switch (c) {
             case OFFENSE -> NamedTextColor.RED;
@@ -337,7 +353,11 @@ public class Menus implements Listener {
     }
 
     public static Inventory create(MenuHolder holder, int size, String title) {
-        Inventory inv = Bukkit.createInventory(holder, size, text(title, NamedTextColor.DARK_GREEN));
+        return create(holder, size, text(title, NamedTextColor.DARK_GREEN));
+    }
+
+    public static Inventory create(MenuHolder holder, int size, Component title) {
+        Inventory inv = Bukkit.createInventory(holder, size, title);
         holder.setInventory(inv);
         return inv;
     }

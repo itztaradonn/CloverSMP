@@ -1,0 +1,40 @@
+{
+  "providers": [
+    {
+      "type": "bitmap",
+      "file": "cloverblessing:font/clover.png",
+      "ascent": 11,
+      "height": 14,
+      "chars": [
+        "\ue000"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cloverblessing:font/clover_cursed.png",
+      "ascent": 11,
+      "height": 14,
+      "chars": [
+        "\ue001"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cloverblessing:font/clover.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue002"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "cloverblessing:font/clover_cursed.png",
+      "ascent": 8,
+      "height": 9,
+      "chars": [
+        "\ue003"
+      ]
+    }
+  ]
+}

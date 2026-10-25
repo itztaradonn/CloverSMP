@@ -57,3 +57,8 @@ Setup: `/clover admin seed <you> 16`, `/clover admin scrap <you> echo_leaf`, `/c
 - [ ] Field Guide shows discovered recipes in full, others as ??? with hints
 - [ ] Every Curse recipe needs a Wither Rose
 - [ ] A killed Ender Dragon drops a recipe scrap
+
+## Clover icon (resource pack)
+- [ ] On join the server offers the pack; after accepting, the action bar starts with the green clover
+- [ ] With a curse equipped (leaf 5 open) it switches to the red/black clover
+- [ ] The /clover menu title shows the small clover icon

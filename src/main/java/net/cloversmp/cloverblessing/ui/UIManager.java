@@ -63,7 +63,8 @@ public class UIManager {
 
     /** e.g. "🍀⚔ 🍀🛡 🍀💨 3s 🍂 ☠ ⚡650/1000" */
     Component actionBar(Clover clover) {
-        TextComponent.Builder bar = Component.text();
+        boolean cursed = clover.getEquippedBlessing(LeafSlot.CURSE) != null && charge.isLeafActive(clover, LeafSlot.CURSE);
+        TextComponent.Builder bar = Component.text().append(Menus.cloverIcon(cursed, true), Component.space());
         for (LeafSlot slot : LeafSlot.values()) {
             Blessing b = clover.getEquippedBlessing(slot);
             boolean open = charge.isLeafActive(clover, slot);
