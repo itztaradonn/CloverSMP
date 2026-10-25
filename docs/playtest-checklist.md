@@ -75,3 +75,8 @@ Sounds are placeholders until your ElevenLabs files are in `art/sfx/` (see `docs
 - [ ] Press / graft / prune each have a sound; a kill plays the charge blip
 - [ ] Clover ring at your feet: one green 3-dot cluster per open leaf (left/top/right/bottom), a grey-brown dot for a wilted leaf; with an active curse the clusters turn dark with red edges and a blood-red/black swirl rises round the body, with a rare soul/smoke wisp and a per-curse tell (slime, crit, drip, bell ring)
 - [ ] A quiet private ding when a blessing comes off cooldown
+
+## Balance stats
+- [ ] `/clover admin stats` opens a menu: pick % and kill share % per blessing, with counts
+- [ ] After 10 min with a 4-leaf player online, loadouts sampled goes up; a PvP kill by a 4-leaf player adds a kill
+- [ ] Over 40% pick or 55% kill share (with 20+ samples) shows red with a glint; `/clover admin stats reset` clears it

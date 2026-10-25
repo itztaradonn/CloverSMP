@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.ui;
 
+import net.cloversmp.cloverblessing.stats.BalanceStats;
 import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.blessing.BlessingManager;
 import net.cloversmp.cloverblessing.blessing.BlessingRegistry;
@@ -162,6 +163,37 @@ public class Menus implements Listener {
         player.openInventory(inv);
     }
 
+    private static final double PICK_LIMIT = 0.40, KILL_LIMIT = 0.55;
+    private static final int MIN_SAMPLES = 20;
+
+    /** Admin: the dominance watch. Red and glowing when over the doc's 40 % pick or 55 % kill-share lines. */
+    public void openAdminStats(Player player, BalanceStats stats) {
+        Inventory inv = create(new MenuHolder(MenuHolder.Kind.ADMIN_STATS, null), 54, "☘ Balance stats (admin)");
+        List<BlessingCore> all = List.copyOf(registry.getAllCores());
+        for (int i = 0; i < all.size() && i < HERBARIUM_PAGE; i++) {
+            BlessingCore core = all.get(i);
+            String id = core.getId();
+            boolean flagged = stats.overPicked(id, PICK_LIMIT, MIN_SAMPLES) || stats.overKilling(id, KILL_LIMIT, MIN_SAMPLES);
+            ItemStack it = item(materialFor(core.getCategory()),
+                    text(core.getDisplayName(), flagged ? NamedTextColor.RED : categoryColor(core.getCategory())),
+                    line(String.format("Pick rate: %.0f%% (%d / %d loadouts)", stats.pickRate(id) * 100, stats.picks(id),
+                            stats.loadouts()), stats.overPicked(id, PICK_LIMIT, MIN_SAMPLES) ? NamedTextColor.RED : NamedTextColor.GRAY),
+                    line(String.format("Kill share: %.0f%% (%d / %d kills)", stats.killShare(id) * 100, stats.killsWith(id),
+                            stats.kills()), stats.overKilling(id, KILL_LIMIT, MIN_SAMPLES) ? NamedTextColor.RED : NamedTextColor.GRAY),
+                    line(stats.loadouts() < MIN_SAMPLES || stats.kills() < MIN_SAMPLES
+                            ? "Low sample: needs " + MIN_SAMPLES + " loadouts and kills before flagging" : "Flags at >40% pick or >55% kill share",
+                            NamedTextColor.DARK_GRAY));
+            if (flagged) {
+                ItemMeta meta = it.getItemMeta();
+                meta.setEnchantmentGlintOverride(true);
+                it.setItemMeta(meta);
+            }
+            inv.setItem(i, it);
+        }
+        inv.setItem(BACK_SLOT, item(Material.ARROW, text("Back to your clover", NamedTextColor.YELLOW)));
+        player.openInventory(inv);
+    }
+
     /** Every recipe: discovered ones in full, the rest as silhouettes with category and ingredient hints. */
     public void openFieldGuide(Player player) {
         Clover clover = data.getClover(player.getUniqueId());
@@ -277,6 +309,9 @@ public class Menus implements Listener {
                 if (blessings.give(clover, core.getId(), null) != null) {
                     player.sendMessage(Component.text("Added " + core.getDisplayName() + " to your herbarium.", NamedTextColor.GREEN));
                 }
+            }
+            case ADMIN_STATS -> {
+                if (raw == BACK_SLOT) reopen(player, () -> openClover(player));
             }
             case FIELD_GUIDE -> {
                 if (raw == BACK_SLOT) reopen(player, () -> openClover(player));

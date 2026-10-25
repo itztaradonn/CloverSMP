@@ -143,3 +143,8 @@ storage:
   type: json
   # Auto-save interval (minutes)
   auto-save-minutes: 5
+
+# --- Balance stats (/clover admin stats) ---
+stats:
+  # How often online 4-leaf players' loadouts are sampled for pick rate
+  snapshot-minutes: 10

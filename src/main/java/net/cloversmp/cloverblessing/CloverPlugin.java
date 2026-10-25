@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing;
 
+import net.cloversmp.cloverblessing.stats.StatsService;
 import net.cloversmp.cloverblessing.blessing.*;
 import net.cloversmp.cloverblessing.charge.ChargeManager;
 import net.cloversmp.cloverblessing.combat.AntiAbuseEngine;
@@ -37,6 +38,7 @@ public final class CloverPlugin extends JavaPlugin {
     private BlessingRegistry registry;
     private RecipeRegistry recipes;
     private NamespacedKey seedRecipeKey;
+    private StatsService stats;
 
     @Override
     public void onEnable() {
@@ -87,11 +89,15 @@ public final class CloverPlugin extends JavaPlugin {
             if (handler instanceof Listener listener) pm.registerEvents(listener, this);
         }
 
+        stats = new StatsService(this, dataManager, chargeManager);
+        pm.registerEvents(stats, this);
+        stats.start();
+
         var cmd = getCommand("clover");
         if (cmd == null) {
             throw new IllegalStateException("clover command is missing from plugin.yml");
         }
-        var handler = new CloverCommand(this, dataManager, registry, blessingManager, chargeManager, parties, menus, items, blessingEngine);
+        var handler = new CloverCommand(this, dataManager, registry, blessingManager, chargeManager, parties, menus, items, blessingEngine, stats);
         cmd.setExecutor(handler);
         cmd.setTabCompleter(handler);
 
@@ -122,6 +128,7 @@ public final class CloverPlugin extends JavaPlugin {
         if (blessingEngine != null) blessingEngine.shutdown();
         getServer().getScheduler().cancelTasks(this);
         if (dataManager != null) dataManager.saveAll(false);
+        if (stats != null) stats.save();
     }
 
     /** Reloads config.yml and recipes.yml (/clover admin reload). */

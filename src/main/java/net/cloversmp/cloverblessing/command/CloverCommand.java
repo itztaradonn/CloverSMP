@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.command;
 
+import net.cloversmp.cloverblessing.stats.StatsService;
 import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.blessing.BlessingEngine;
 import net.cloversmp.cloverblessing.blessing.BlessingManager;
@@ -40,9 +41,11 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
     private final Menus menus;
     private final CloverItems items;
     private final BlessingEngine engine;
+    private final StatsService stats;
 
     public CloverCommand(CloverPlugin plugin, DataManager data, BlessingRegistry registry, BlessingManager blessings,
-                         ChargeManager charge, PartyManager parties, Menus menus, CloverItems items, BlessingEngine engine) {
+                         ChargeManager charge, PartyManager parties, Menus menus, CloverItems items, BlessingEngine engine,
+                         StatsService stats) {
         this.plugin = plugin;
         this.data = data;
         this.registry = registry;
@@ -52,6 +55,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         this.menus = menus;
         this.items = items;
         this.engine = engine;
+        this.stats = stats;
     }
 
     @Override
@@ -76,7 +80,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
         msg(s, "/clover inspect <player> — see someone's leaves", NamedTextColor.GRAY);
         msg(s, "/clover party invite|accept|leave|kick|list", NamedTextColor.GRAY);
         if (s.hasPermission("clover.admin")) {
-            msg(s, "/clover admin menu|debug|give|seed|scrap|setcharge|reset|reload ...", NamedTextColor.GRAY);
+            msg(s, "/clover admin menu|debug|stats|give|seed|scrap|setcharge|reset|reload ...", NamedTextColor.GRAY);
         }
     }
 
@@ -200,6 +204,18 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
             return;
         }
         String action = args.length < 2 ? "" : args[1].toLowerCase(Locale.ROOT);
+        if (action.equals("stats")) {
+            if (args.length >= 3 && args[2].equalsIgnoreCase("reset")) {
+                stats.reset();
+                plugin.getLogger().info(s.getName() + " reset the balance stats");
+                msg(s, "Balance stats reset.", NamedTextColor.YELLOW);
+            } else if (s instanceof Player p) {
+                menus.openAdminStats(p, stats.stats());
+            } else {
+                msg(s, "Loadouts sampled: " + stats.stats().loadouts() + ", kills: " + stats.stats().kills(), NamedTextColor.GRAY);
+            }
+            return;
+        }
         if (action.equals("menu") || action.equals("debug")) {
             if (!(s instanceof Player p)) {
                 msg(s, "Only players can use this.", NamedTextColor.RED);
@@ -289,7 +305,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
                 plugin.getLogger().info(s.getName() + " reset the clover of " + target.getName());
                 msg(s, "Reset " + target.getName() + "'s clover.", NamedTextColor.YELLOW);
             }
-            default -> msg(s, "Usage: /clover admin <menu|debug|give|seed|scrap|setcharge|reset|reload>", NamedTextColor.RED);
+            default -> msg(s, "Usage: /clover admin <menu|debug|stats|give|seed|scrap|setcharge|reset|reload>", NamedTextColor.RED);
         }
     }
 
@@ -314,7 +330,7 @@ public class CloverCommand implements CommandExecutor, TabCompleter {
                 case "inspect" -> onlineNames();
                 case "party" -> List.of("invite", "accept", "leave", "kick", "list");
                 case "admin" -> sender.hasPermission("clover.admin")
-                        ? List.of("menu", "debug", "give", "seed", "scrap", "setcharge", "reset", "reload") : List.of();
+                        ? List.of("menu", "debug", "stats", "give", "seed", "scrap", "setcharge", "reset", "reload") : List.of();
                 default -> List.of();
             };
             case 3 -> args[0].equalsIgnoreCase("admin") || args[1].equalsIgnoreCase("invite")
