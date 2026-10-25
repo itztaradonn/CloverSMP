@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -22,7 +23,12 @@ public class HungeringCloverCurse implements BlessingHandler {
     public boolean onFoodChange(BlessingContext ctx, FoodLevelChangeEvent event) {
         int current = ctx.player().getFoodLevel();
         int next = event.getFoodLevel();
-        if (next < current) event.setFoodLevel(Math.max(0, current - 2 * (current - next)));
+        if (next < current) {
+            event.setFoodLevel(Math.max(0, current - 2 * (current - next)));
+            if (Effects.every(ctx.player().getUniqueId(), "hungering", 10_000)) {
+                Effects.sound(ctx.player().getLocation(), "curse.hungering_clover", 1f, 1f);
+            }
+        }
         return false;
     }
 

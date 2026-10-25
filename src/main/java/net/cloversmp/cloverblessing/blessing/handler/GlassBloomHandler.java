@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
 import net.cloversmp.cloverblessing.model.BlessingTag;
@@ -32,6 +33,9 @@ public class GlassBloomHandler implements BlessingHandler {
 
     private boolean boost(BlessingContext ctx, EntityDamageByEntityEvent event) {
         event.setDamage(event.getDamage() * (1 + 0.25 * ctx.strength(BlessingTag.DAMAGE_BOOST)));
+        var at = Effects.body(event.getEntity(), 0.6);
+        at.getWorld().spawnParticle(org.bukkit.Particle.BLOCK, at, 6, 0.2, 0.2, 0.2, 0, org.bukkit.Material.GLASS.createBlockData());
+        if (Effects.every(ctx.player().getUniqueId(), "glass_bloom", 400)) Effects.sound(at, "blessing.glass_bloom", 0.6f, 1f);
         return false; // always on; no trigger flash
     }
 

@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
 import net.cloversmp.cloverblessing.model.BlessingTag;
@@ -38,6 +39,7 @@ public class LeechvineHandler implements BlessingHandler {
         double healed = ctx.engine().heal(ctx, want);
         if (healed <= 0) return false;
         h.addLast(new Heal(now, healed));
+        Effects.stream(Effects.body(target, 0.6), Effects.body(ctx.player(), 0.6), org.bukkit.Color.fromRGB(0x7A2E3A));
         return true;
     }
 }

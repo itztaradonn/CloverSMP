@@ -65,3 +65,12 @@ Setup: `/clover admin seed <you> 16`, `/clover admin scrap <you> echo_leaf`, `/c
 - [ ] The action bar is just the clover and ⚡charge (cooldowns are in /clover)
 - [ ] With a curse equipped (leaf 5 open) it switches to the red/black clover
 - [ ] The /clover menu title shows the small clover icon
+
+## Effects (VFX/SFX)
+Sounds are placeholders until your ElevenLabs files are in `art/sfx/` (see `docs/sfx-prompts.md`; then `python -I tools/build_sounds.py` and `./gradlew resourcePack`).
+- [ ] Each blessing has its own sound and particles when it fires (no more shared chime); nearby players see and hear it
+- [ ] Echo Leaf plays the copied blessing's sound lower, with a sculk pop
+- [ ] Opening a leaf: leaf burst + chime. Dying and losing a leaf: brown dust + crunch
+- [ ] Taking a curse: soul burst; breaking one: smoke + shatter. Hollow Bell tolls every 30 s
+- [ ] Press / graft / prune each have a sound; a kill plays the charge blip
+- [ ] A quiet private ding when a blessing comes off cooldown

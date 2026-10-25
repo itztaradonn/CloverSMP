@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
@@ -71,7 +72,8 @@ public class WaystemHandler implements BlessingHandler, Listener {
         ctx.clover().setHandlerData(DATA_KEY, serialize(loc));
         spawn(p.getUniqueId(), loc);
         p.sendMessage(Component.text("Waystem planted.", NamedTextColor.GREEN));
-        p.playSound(loc, Sound.BLOCK_AZALEA_PLACE, 1f, 1f);
+        Effects.sound(loc, "blessing.waystem_plant", 1f, 1f);
+        Effects.particles(loc.clone().add(0, 0.5, 0), Particle.END_ROD, 12, 0.2);
         return false; // planting is free; the cooldown starts on recall
     }
 
@@ -114,7 +116,7 @@ public class WaystemHandler implements BlessingHandler, Listener {
                 dest.setYaw(p.getLocation().getYaw());
                 dest.setPitch(p.getLocation().getPitch());
                 p.teleport(dest);
-                p.playSound(dest, Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 1.2f);
+                Effects.sound(dest, "blessing.waystem_recall", 1f, 1f);
                 ctx.fire();
             }
         }, 5L, 5L);

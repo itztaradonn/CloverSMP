@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
 import net.cloversmp.cloverblessing.model.BlessingTag;
@@ -32,7 +33,7 @@ public class StingerHandler implements BlessingHandler {
     public boolean onArrowHit(BlessingContext ctx, EntityDamageByEntityEvent event, LivingEntity target) {
         marks.computeIfAbsent(ctx.instanceId(), k -> new ConcurrentHashMap<>())
                 .put(target.getUniqueId(), System.currentTimeMillis() + MARK_MS);
-        target.getWorld().spawnParticle(Particle.CRIT, target.getLocation().add(0, target.getHeight() + 0.3, 0), 8, 0.2, 0.1, 0.2, 0);
+        Effects.particles(Effects.body(target, 1.15), Particle.ELECTRIC_SPARK, 10, 0.3);
         return true;
     }
 
@@ -42,6 +43,7 @@ public class StingerHandler implements BlessingHandler {
         Long until = m == null ? null : m.get(target.getUniqueId());
         if (until == null || until < System.currentTimeMillis()) return false;
         event.setDamage(event.getDamage() * (1 + 0.15 * ctx.strength(BlessingTag.DAMAGE_BOOST)));
+        Effects.particles(Effects.body(target, 0.6), Particle.ENCHANTED_HIT, 12, 0.3);
         return true;
     }
 

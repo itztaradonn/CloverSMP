@@ -5,7 +5,6 @@ import net.cloversmp.cloverblessing.model.BlessingCore;
 import net.cloversmp.cloverblessing.model.BlessingTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
@@ -60,7 +59,6 @@ public class SpringleafHandler implements BlessingHandler {
         Vector dir = p.getLocation().getDirection().setY(0);
         if (dir.lengthSquared() > 1e-6) dir.normalize().multiply(1.25 * power);
         p.setVelocity(dir.setY(0.6 * Math.max(0.75, power)));
-        p.getWorld().playSound(p, Sound.ENTITY_SLIME_JUMP, 0.8f, 1.2f);
         return true;
     }
 

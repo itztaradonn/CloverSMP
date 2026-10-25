@@ -1,5 +1,10 @@
 package net.cloversmp.cloverblessing.charge;
 
+import org.bukkit.Particle;
+import org.bukkit.Location;
+import org.bukkit.Color;
+import org.bukkit.Bukkit;
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.model.ChargeSource;
 import net.cloversmp.cloverblessing.model.Clover;
@@ -57,11 +62,36 @@ public class ChargeManager {
         boolean gate = plugin.getConfig().getBoolean("charge.leaf4-requires-pvp-or-boss", true);
         int rate = plugin.getConfig().getInt("pollen.conversion-rate", 1);
 
+        int leavesBefore = getLeafCount(clover);
         ChargeMath.Result r = ChargeMath.gain(clover.getCharge(), amount, mob, gate,
                 getLeaf4Threshold(), getMaxCharge(), rate);
         clover.setCharge(r.charge());
         clover.addPollen(r.pollen());
         checkLeaf2Permanence(clover);
+
+        if (amount > 0) {
+            Effects.sound(player.getLocation(), "charge.gain", 0.6f, 1f);
+            Effects.particles(Effects.body(player, 1.1), Particle.ELECTRIC_SPARK, 4, 0.2);
+            if (modifiers.gain(player) > 1.0) {
+                Effects.sound(player.getLocation(), "blessing.wager_root_win", 1f, 1f);
+                Effects.dust(Effects.body(player, 0.6), Color.fromRGB(0xF7C948), 12, 0.4);
+            }
+        }
+        leafEffects(player, leavesBefore, getLeafCount(clover));
+    }
+
+    /** A leaf opening or wilting is a moment everyone nearby should notice. */
+    private void leafEffects(Player player, int before, int after) {
+        if (player == null || before == after) return;
+        Location chest = Effects.body(player, 0.6);
+        if (after > before) {
+            Effects.sound(chest, "clover.leaf_open", 1f, 1f);
+            Effects.particles(chest, Particle.CHERRY_LEAVES, 30, 0.8);
+            Effects.particles(chest, Particle.HAPPY_VILLAGER, 15, 0.6);
+        } else {
+            Effects.sound(chest, "clover.leaf_wilt", 1f, 1f);
+            Effects.dust(chest, Color.fromRGB(0x7A5230), 20, 0.6);
+        }
     }
 
     public void addCharge(Player player, int baseAmount, ChargeSource source) {
@@ -73,8 +103,14 @@ public class ChargeManager {
         Clover clover = dataManager.getClover(player.getUniqueId());
         if (clover == null) return;
         double percent = plugin.getConfig().getDouble("charge.death-penalty-percent", 35);
-        clover.setCharge(ChargeMath.afterDeath(clover.getCharge(), percent,
-                modifiers.deathPenalty(player), floor(clover)));
+        int leavesBefore = getLeafCount(clover);
+        double penaltyMultiplier = modifiers.deathPenalty(player);
+        clover.setCharge(ChargeMath.afterDeath(clover.getCharge(), percent, penaltyMultiplier, floor(clover)));
+        if (penaltyMultiplier > 1.0) {
+            Effects.sound(player.getLocation(), "blessing.wager_root_loss", 1f, 1f);
+            Effects.particles(Effects.body(player, 0.6), Particle.ASH, 25, 0.5);
+        }
+        leafEffects(player, leavesBefore, getLeafCount(clover));
     }
 
     /** Removes a percentage of current charge (breaking a curse), respecting the floor. */
@@ -84,8 +120,10 @@ public class ChargeManager {
 
     /** Admin: sets charge directly, clamped to 0..max. */
     public void setCharge(Clover clover, int amount) {
+        int leavesBefore = getLeafCount(clover);
         clover.setCharge(Math.min(Math.max(0, amount), getMaxCharge()));
         checkLeaf2Permanence(clover);
+        leafEffects(Bukkit.getPlayer(clover.getPlayerUuid()), leavesBefore, getLeafCount(clover));
     }
 
     private int floor(Clover clover) {

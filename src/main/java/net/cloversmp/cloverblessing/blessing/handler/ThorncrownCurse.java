@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
 import org.bukkit.entity.LivingEntity;
@@ -37,6 +38,10 @@ public class ThorncrownCurse implements BlessingHandler {
     public boolean onDamaged(BlessingContext ctx, EntityDamageEvent event) {
         if (event instanceof EntityDamageByEntityEvent byEntity && fromPlayer(byEntity)) {
             event.setDamage(event.getDamage() * 1.15);
+            if (Effects.every(ctx.player().getUniqueId(), "thorncrown", 1_000)) {
+                Effects.sound(ctx.player().getLocation(), "curse.thorncrown", 1f, 1f);
+                Effects.particles(Effects.body(ctx.player(), 0.8), org.bukkit.Particle.DAMAGE_INDICATOR, 6, 0.3);
+            }
         }
         return false;
     }

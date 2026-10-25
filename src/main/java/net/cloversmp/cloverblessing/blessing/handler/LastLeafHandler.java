@@ -6,7 +6,6 @@ import net.cloversmp.cloverblessing.model.BlessingCore;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
-import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
@@ -36,7 +35,6 @@ public class LastLeafHandler implements BlessingHandler {
         var max = p.getAttribute(Attribute.MAX_HEALTH);
         p.setHealth(Math.min(SAVE_HP, max == null ? SAVE_HP : max.getValue()));
         root(ctx.engine(), p);
-        p.getWorld().playSound(p, Sound.ITEM_TOTEM_USE, 0.5f, 1.6f);
         p.getWorld().spawnParticle(Particle.FALLING_SPORE_BLOSSOM, p.getLocation().add(0, 1, 0), 30, 0.4, 0.6, 0.4, 0);
         return true;
     }

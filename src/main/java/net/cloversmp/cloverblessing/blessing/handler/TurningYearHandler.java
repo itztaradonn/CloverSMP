@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.blessing.BalanceRules;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
@@ -23,6 +24,8 @@ public class TurningYearHandler implements BlessingHandler {
     private static final int SPRING = 0, SUMMER = 1, AUTUMN = 2, WINTER = 3;
     private static final Color[] COLORS = {
             Color.fromRGB(0xF4A7C0), Color.fromRGB(0xF7C948), Color.fromRGB(0xD9622B), Color.fromRGB(0xA8D8F0)};
+
+    private final java.util.Map<java.util.UUID, Integer> lastPhase = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Override
     public BlessingCore createCore() {
@@ -63,6 +66,11 @@ public class TurningYearHandler implements BlessingHandler {
     @Override
     public boolean onSecond(BlessingContext ctx, StatSink stats) {
         int phase = phase();
+        Integer before = lastPhase.put(ctx.instanceId(), phase);
+        if (before != null && before != phase) {
+            Effects.sound(ctx.player().getLocation(), "blessing.turning_year", 1f, 0.8f + 0.15f * phase);
+            Effects.dust(Effects.body(ctx.player(), 0.6), COLORS[phase], 20, 0.6);
+        }
         ctx.player().getWorld().spawnParticle(Particle.DUST, ctx.player().getLocation().add(0, 1.0, 0), 6,
                 0.4, 0.5, 0.4, 0, new Particle.DustOptions(COLORS[phase], 1.0f));
         if (phase == AUTUMN) stats.speed(0.10 * ctx.strength(BlessingTag.SPEED));

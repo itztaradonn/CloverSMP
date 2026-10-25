@@ -1,0 +1,282 @@
+{
+  "blessing.thornlash": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.crit",
+        "type": "event",
+        "pitch": 1.4,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.stinger": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.bee.sting",
+        "type": "event",
+        "pitch": 1.2,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.mossguard": {
+    "sounds": [
+      {
+        "name": "minecraft:block.moss.place",
+        "type": "event",
+        "pitch": 0.8,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.last_leaf": {
+    "sounds": [
+      {
+        "name": "minecraft:item.totem.use",
+        "type": "event",
+        "pitch": 1.6,
+        "volume": 0.5
+      }
+    ]
+  },
+  "blessing.springleaf": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.slime.jump",
+        "type": "event",
+        "pitch": 1.2,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.quiet_dew": {
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "pitch": 1.8,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.leechvine": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.drink",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.tangle_seed": {
+    "sounds": [
+      {
+        "name": "minecraft:block.cave_vines.place",
+        "type": "event",
+        "pitch": 0.8,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.hobble": {
+    "sounds": [
+      {
+        "name": "minecraft:item.armor.equip_chain",
+        "type": "event",
+        "pitch": 0.8,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.waystem_plant": {
+    "sounds": [
+      {
+        "name": "minecraft:block.azalea.place",
+        "type": "event",
+        "pitch": 1.0,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.waystem_recall": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.enderman.teleport",
+        "type": "event",
+        "pitch": 1.2,
+        "volume": 0.8
+      }
+    ]
+  },
+  "blessing.glass_bloom": {
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.hit",
+        "type": "event",
+        "pitch": 1.6,
+        "volume": 0.6
+      }
+    ]
+  },
+  "blessing.wager_root_win": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.levelup",
+        "type": "event",
+        "pitch": 1.8,
+        "volume": 0.4
+      }
+    ]
+  },
+  "blessing.wager_root_loss": {
+    "sounds": [
+      {
+        "name": "minecraft:block.wood.break",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      }
+    ]
+  },
+  "blessing.turning_year": {
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.resonate",
+        "type": "event",
+        "pitch": 1.0,
+        "volume": 1.0
+      }
+    ]
+  },
+  "curse.bloodroot": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.warden.heartbeat",
+        "type": "event",
+        "pitch": 1.2,
+        "volume": 1.0
+      }
+    ]
+  },
+  "curse.thorncrown": {
+    "sounds": [
+      {
+        "name": "minecraft:enchant.thorns.hit",
+        "type": "event",
+        "pitch": 0.8,
+        "volume": 1.0
+      }
+    ]
+  },
+  "curse.hollow_bell": {
+    "sounds": [
+      {
+        "name": "minecraft:block.bell.use",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.0
+      }
+    ]
+  },
+  "curse.hungering_clover": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.burp",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.0
+      }
+    ]
+  },
+  "clover.leaf_open": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.levelup",
+        "type": "event",
+        "pitch": 1.4,
+        "volume": 0.6
+      }
+    ]
+  },
+  "clover.leaf_wilt": {
+    "sounds": [
+      {
+        "name": "minecraft:block.grass.break",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      }
+    ]
+  },
+  "clover.pact_take": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.elder_guardian.curse",
+        "type": "event",
+        "pitch": 0.8,
+        "volume": 0.5
+      }
+    ]
+  },
+  "clover.pact_break": {
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      }
+    ]
+  },
+  "craft.press": {
+    "sounds": [
+      {
+        "name": "minecraft:block.composter.fill_success",
+        "type": "event",
+        "pitch": 1.0,
+        "volume": 1.0
+      }
+    ]
+  },
+  "craft.graft": {
+    "sounds": [
+      {
+        "name": "minecraft:block.smithing_table.use",
+        "type": "event",
+        "pitch": 1.2,
+        "volume": 1.0
+      }
+    ]
+  },
+  "craft.prune": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.sheep.shear",
+        "type": "event",
+        "pitch": 1.0,
+        "volume": 1.0
+      }
+    ]
+  },
+  "charge.gain": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.experience_orb.pickup",
+        "type": "event",
+        "pitch": 1.6,
+        "volume": 0.3
+      }
+    ]
+  },
+  "ui.blessing_ready": {
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.bell",
+        "type": "event",
+        "pitch": 2.0,
+        "volume": 0.4
+      }
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
 import org.bukkit.potion.PotionEffect;
@@ -22,6 +23,10 @@ public class HollowBellCurse implements BlessingHandler {
     @Override
     public boolean onSecond(BlessingContext ctx, StatSink stats) {
         ctx.player().addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 40, 0, true, false, false));
+        // The toll carries further than normal sounds, so it gives the wearer away.
+        if (Effects.every(ctx.player().getUniqueId(), "hollow_bell", 30_000)) {
+            Effects.sound(ctx.player().getLocation(), "curse.hollow_bell", 1.5f, 1f);
+        }
         return false;
     }
 

@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.crafting;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.blessing.BlessingManager;
 import net.cloversmp.cloverblessing.blessing.BlessingRegistry;
@@ -150,7 +151,8 @@ public class PressingTableMenu implements Listener {
         for (int slot : INGREDIENT_SLOTS) if (inv.getItem(slot) != null) take(inv, slot);
         Blessing b = blessings.give(clover, o.core.getId(), null);
         log.log(CraftLog.Action.PRESS, player.getName(), b.getId(), b.getCoreId(), null);
-        player.playSound(player, Sound.BLOCK_COMPOSTER_FILL_SUCCESS, 1f, 1f);
+        Effects.sound(player.getLocation(), "craft.press", 1f, 1f);
+        Effects.particles(Effects.body(player, 0.6), org.bukkit.Particle.COMPOSTER, 12, 0.4);
         player.sendMessage(Component.text("Pressed " + o.core.getDisplayName() + ". It's in your herbarium (/clover).",
                 NamedTextColor.GREEN));
         refreshPreview(player, inv);
@@ -251,7 +253,8 @@ public class PressingTableMenu implements Listener {
         data.saveNow(player.getUniqueId());
         player.saveData();
         log.log(CraftLog.Action.GRAFT, player.getName(), blessingId, b.getCoreId(), graft.name());
-        player.playSound(player, Sound.BLOCK_SMITHING_TABLE_USE, 1f, 1.2f);
+        Effects.sound(player.getLocation(), "craft.graft", 1f, 1f);
+        Effects.particles(Effects.body(player, 0.6), org.bukkit.Particle.WAX_ON, 12, 0.4);
         player.sendMessage(Component.text(core.getDisplayName() + " grafted with " + graft.getDisplayName() + ".", NamedTextColor.LIGHT_PURPLE));
     }
 
@@ -270,7 +273,7 @@ public class PressingTableMenu implements Listener {
         data.saveNow(player.getUniqueId());
         player.saveData();
         log.log(CraftLog.Action.PRUNE, player.getName(), blessingId, b.getCoreId(), b.getGraft().name());
-        player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1f, 1f);
+        Effects.sound(player.getLocation(), "craft.prune", 1f, 1f);
         player.sendMessage(Component.text("Pruned. Refunded " + pollen + " Pollen and " + mats + "× " + Menus.pretty(mat) + ".",
                 NamedTextColor.YELLOW));
     }

@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
 import net.cloversmp.cloverblessing.model.BlessingTag;
@@ -43,6 +44,8 @@ public class ThornlashHandler implements BlessingHandler {
         if (hits >= 3) {
             chains.remove(key);
             event.setDamage(event.getDamage() * (1 + 0.25 * ctx.strength(BlessingTag.DAMAGE_BOOST)));
+            Effects.dust(Effects.body(target, 0.6), org.bukkit.Color.fromRGB(0xB02E26), 14, 0.4);
+            Effects.particles(Effects.body(target, 0.6), org.bukkit.Particle.CRIT, 10, 0.3);
             return true;
         }
         chains.put(key, new Chain(target.getUniqueId(), hits, now));

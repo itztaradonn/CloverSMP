@@ -1,5 +1,8 @@
 package net.cloversmp.cloverblessing.blessing;
 
+import org.bukkit.Location;
+import org.bukkit.Color;
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.blessing.handler.BlessingContext;
 import net.cloversmp.cloverblessing.blessing.handler.BlessingHandler;
@@ -223,10 +226,35 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
                 BalanceRules.cappedCooldownMs(baseMs, modifier, maxCdr));
 
         flashUntil.put(ctx.instanceId(), System.currentTimeMillis() + FLASH_MS);
+        signature(ctx);
+    }
+
+    /** Handlers that play their own sound where it happens (impact point, recall destination). */
+    private static final Set<String> OWN_SOUND = Set.of("tangle_seed", "waystem");
+
+    /** The trigger's sound and owner-centred particles; target-centred effects live in the handlers. */
+    private void signature(BlessingContext ctx) {
         Player p = ctx.player();
-        p.playSound(p, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.6f, ctx.slot().isCurse() ? 0.6f : 1.4f);
-        p.getWorld().spawnParticle(ctx.slot().isCurse() ? Particle.SMOKE : Particle.HAPPY_VILLAGER,
-                p.getLocation().add(0, 1.0, 0), 6, 0.3, 0.4, 0.3, 0);
+        String id = ctx.core().getId();
+        Location chest = Effects.body(p, 0.6);
+        if (!OWN_SOUND.contains(id)) {
+            // An Echo copy plays the copied blessing's sound, quieter and lower.
+            Effects.sound(p.getLocation(), (ctx.core().isCurse() ? "curse." : "blessing.") + id,
+                    ctx.echo() ? 0.6f : 1f, ctx.echo() ? 0.7f : 1f);
+        }
+        if (ctx.echo()) Effects.particles(chest, Particle.SCULK_CHARGE_POP, 6, 0.3);
+        switch (id) {
+            case "mossguard" -> Effects.dust(chest, Color.fromRGB(0x5A7D2A), 12, 0.5);
+            case "last_leaf" -> Effects.particles(chest, Particle.TOTEM_OF_UNDYING, 15, 0.5);
+            case "springleaf" -> {
+                Effects.particles(p.getLocation(), Particle.CLOUD, 8, 0.3);
+                Effects.particles(chest, Particle.CHERRY_LEAVES, 10, 0.4);
+            }
+            case "quiet_dew" -> Effects.particles(Effects.body(p, 1.1), Particle.FALLING_WATER, 10, 0.4);
+            case "waystem" -> Effects.particles(chest, Particle.END_ROD, 20, 0.5);
+            default -> {
+            }
+        }
     }
 
     public boolean isFlashing(UUID blessingId) {
@@ -270,7 +298,12 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
      * @return HP actually healed on the holder
      */
     public double heal(BlessingContext ctx, double hp) {
-        double healed = healPlayer(ctx.player(), hp * aggregate(ctx.player(), BlessingHandler::healMultiplier, 1.0, false));
+        double multiplier = aggregate(ctx.player(), BlessingHandler::healMultiplier, 1.0, false);
+        double healed = healPlayer(ctx.player(), hp * multiplier);
+        if (healed > 0 && multiplier > 1.0 && Effects.every(ctx.player().getUniqueId(), "bloodroot", 3_000)) {
+            Effects.sound(ctx.player().getLocation(), "curse.bloodroot", 1f, 1f);
+            Effects.dust(Effects.body(ctx.player(), 0.6), Color.fromRGB(0x5A0F14), 10, 0.4);
+        }
         if (healed > 0 && ctx.source().getGraft() == Graft.WARD) {
             nearestPartner(ctx.player(), 6.0).ifPresent(p -> healPlayer(p, healed * 0.5));
         }
@@ -414,6 +447,7 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
         lastAnyDamageMs.remove(id);
         lastHitDealtMs.remove(id);
         lastDamageTakenMs.remove(id);
+        Effects.clear(id);
     }
 
     // =====================================================================
@@ -432,6 +466,20 @@ public class BlessingEngine implements Listener, ChargeManager.Modifiers {
                 }
             });
             applyStats(player, stats);
+            readyDing(player, now);
+        }
+    }
+
+    /** A quiet private ding when an equipped blessing comes off cooldown during the last second. */
+    private void readyDing(Player player, long now) {
+        Clover clover = dataManager.getClover(player.getUniqueId());
+        if (clover == null) return;
+        for (var e : clover.getEquippedBlessings().entrySet()) {
+            long expiry = clover.getCooldownExpiry(e.getValue().getId());
+            if (!e.getKey().isCurse() && expiry > now - 1_000 && expiry <= now) {
+                Effects.privateSound(player, "ui.blessing_ready", 0.6f);
+                return;
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
 import net.cloversmp.cloverblessing.model.BlessingTag;
@@ -48,6 +49,8 @@ public class TangleSeedHandler implements BlessingHandler {
         Player owner = ctx.player();
 
         remove(ctx.instanceId());
+        Effects.sound(center, "blessing.tangle_seed", 1f, 1f);
+        Effects.particles(center, Particle.COMPOSTER, 15, 0.5);
         int[] pulses = {0};
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(ctx.engine().plugin(), () -> {
             if (pulses[0]++ >= ZONE_PULSES) {

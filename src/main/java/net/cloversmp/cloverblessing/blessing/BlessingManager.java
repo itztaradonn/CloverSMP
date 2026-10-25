@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.CloverPlugin;
 import net.cloversmp.cloverblessing.charge.ChargeManager;
 import net.cloversmp.cloverblessing.model.*;
@@ -65,6 +66,11 @@ public class BlessingManager {
         if (current != null && slot.isCurse()) payCurseBreak(player, clover);
 
         clover.equipFromHerbarium(slot, blessingId);
+        if (slot.isCurse()) {
+            Effects.sound(player.getLocation(), "clover.pact_take", 1f, 1f);
+            Effects.particles(Effects.body(player, 0.6), org.bukkit.Particle.SOUL, 20, 0.6);
+            Effects.particles(Effects.body(player, 0.3), org.bukkit.Particle.SQUID_INK, 10, 0.4);
+        }
         long lockMs = plugin.getConfig().getLong("loadout.swap-lock-seconds", 30) * 1000L;
         if (cooldownManager.getRemainingMs(clover, blessingId) < lockMs) {
             cooldownManager.startCooldown(clover, blessingId, lockMs);
@@ -109,6 +115,8 @@ public class BlessingManager {
         chargeManager.removePercent(clover, percent);
         player.sendMessage(Component.text("Breaking the pact cost " + (before - clover.getCharge()) + " charge.",
                 NamedTextColor.DARK_PURPLE));
+        Effects.sound(player.getLocation(), "clover.pact_break", 1f, 1f);
+        Effects.particles(Effects.body(player, 0.6), org.bukkit.Particle.LARGE_SMOKE, 15, 0.4);
     }
 
     private boolean hasEchoElsewhere(Clover clover, LeafSlot target) {

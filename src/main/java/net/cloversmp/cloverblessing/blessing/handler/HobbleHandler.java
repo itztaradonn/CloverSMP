@@ -1,5 +1,6 @@
 package net.cloversmp.cloverblessing.blessing.handler;
 
+import net.cloversmp.cloverblessing.ui.Effects;
 import net.cloversmp.cloverblessing.model.BlessingCategory;
 import net.cloversmp.cloverblessing.model.BlessingCore;
 import net.cloversmp.cloverblessing.model.BlessingTag;
@@ -37,6 +38,7 @@ public class HobbleHandler implements BlessingHandler, Listener {
         long durationMs = Math.round(1_000 * Math.max(0.5, ctx.strength(BlessingTag.CONTROL)));
         hobbled.put(victim.getUniqueId(), System.currentTimeMillis() + durationMs);
         victim.setSprinting(false);
+        Effects.dust(Effects.body(victim, 0.15), org.bukkit.Color.fromRGB(0x6B6B6B), 12, 0.3);
         return true;
     }
 
